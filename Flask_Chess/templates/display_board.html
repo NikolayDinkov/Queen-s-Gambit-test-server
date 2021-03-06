@@ -1,0 +1,117 @@
+{% extends 'base.html' %} {% block title %} Title page 1 {% endblock %} {% block head %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/board.css') }}">
+
+    <meta charset="UTF-8">
+    <title>Chess</title>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="top">
+            <div class="wrapper-inner">
+                <div class="box-inner">A</div>
+                <div class="box-inner">B</div>
+                <div class="box-inner">C</div>
+                <div class="box-inner">D</div>
+                <div class="box-inner">E</div>
+                <div class="box-inner">F</div>
+                <div class="box-inner">G</div>
+                <div class="box-inner">H</div>
+            </div>
+        </div>
+        <div class="box"><img class="piece" src="{{url_for('static', filename='/pictures/bb.svg')}}" /></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="bottom">
+            <div class="wrapper-inner">
+                <div class="box-inner">A</div>
+                <div class="box-inner">B</div>
+                <div class="box-inner">C</div>
+                <div class="box-inner">D</div>
+                <div class="box-inner">E</div>
+                <div class="box-inner">F</div>
+                <div class="box-inner">G</div>
+                <div class="box-inner">H</div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
+{% endblock %} {% block body %} {% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {% block title %} Title page 1 {% endblock %} {% block head %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/temp.css') }}">
+
+    <meta charset="UTF-8">
+    <title>Chess</title>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="top">
+            <div class="wrapper-inner">
+                <div class="box-inner"></div>
+                <div class="box-inner">A</div>
+                <div class="box-inner">B</div>
+                <div class="box-inner">C</div>
+                <div class="box-inner">D</div>
+                <div class="box-inner">E</div>
+                <div class="box-inner">F</div>
+                <div class="box-inner">G</div>
+                <div class="box-inner">H</div>
+                <div class="box-inner"></div>
+            </div>
+        </div>
+
+        <div class="left_side">
+            <div class="wrapper-side">
+                <div class="box-side">8</div>
+                <div class="box-side">7</div>
+                <div class="box-side">6</div>
+                <div class="box-side">5</div>
+                <div class="box-side">4</div>
+                <div class="box-side">3</div>
+                <div class="box-side">2</div>
+                <div class="box-side">1</div>
+            </div>
+        </div>
+
+        <div class="box"><img class="piece" src="{{url_for('static', filename='/pictures/bb.svg')}}" /></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+
+        <div class="box"></div>
+
+
+        <div class="right_side">
+            <div class="box-side">8</div>
+            <div class="box-side">7</div>
+            <div class="box-side">6</div>
+            <div class="box-side">5</div>
+            <div class="box-side">4</div>
+            <div class="box-side">3</div>
+            <div class="box-side">2</div>
+            <div class="box-side">1</div>
+        </div>
+
+        <div class="bottom">
+            <div class="wrapper-inner">
+                <div class="box-inner"></div>
+                <div class="box-inner">A</div>
+                <div class="box-inner">B</div>
+                <div class="box-inner">C</div>
+                <div class="box-inner">D</div>
+                <div class="box-inner">E</div>
+                <div class="box-inner">F</div>
+                <div class="box-inner">G</div>
+                <div class="box-inner">H</div>
+                <div class="box-inner"></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
+{% endblock %} {% block body %} {% endblock %}

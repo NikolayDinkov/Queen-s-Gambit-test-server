@@ -1,0 +1,14 @@
+.piece {
+    transform: scale(2.6);
+}
+
+.grid>div {
+    background: black;
+    padding: 1rem;
+}
+
+.grid>div::before {
+    content: "";
+    padding-bottom: 100%;
+    display: block;
+}
