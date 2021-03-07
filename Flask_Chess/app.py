@@ -173,14 +173,14 @@ class game(object):
         self.w_pcs = [wk, wq, wb1, wb2, wh1, wh2, wr1, wr2, wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8]
         self.b_pcs = [bk, bq, bb1, bb2, bh1, bh2, br1, br2, bp1, bp2, bp3, bp4, bp5, bp6, bp7, bp8]
         self.board1 = [
-                    [br1, bh1, bb1, bk, bq, bb2, bh2, br2],
+                    [br1, bh1, bb1, bq, bk, bb2, bh2, br2],
                     [bp1, bp2, bp3, bp4, bp5, bp6, bp7, bp8],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8],
-                    [wr1, wh1, wb1, wk, wq, wb2, wh2, wr2]
+                    [wr1, wh1, wb1, wq, wk, wb2, wh2, wr2]
                 ]  
 
 @app.route('/')
@@ -208,10 +208,7 @@ def second_page():
     for i in range(0,8):
         board[1][i] = 6
         board[6][i] = 12
-    # for row in range(8):
-    #     for col in range(8):s
-    #         print(board[row][col])
-    #     print("\n")
+
     return render_template("index.html", board=board, images=images)
 
 @app.route('/3')
@@ -222,3 +219,4 @@ def third_page():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

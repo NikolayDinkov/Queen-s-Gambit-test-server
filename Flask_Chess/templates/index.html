@@ -1,8 +1,4 @@
-{% extends 'base.html' %} 
-
-{% block title %} Title page 1 {% endblock %} 
-
-{% block head %}
+{% extends 'base.html' %} {% block title %} Title page 1 {% endblock %} {% block head %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,6 +8,23 @@
 
     <meta charset="UTF-8">
     <title>Chess</title>
+
+    <script>
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("content", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var image = ev.dataTransfer.getData("content");
+            ev.target.appendChild(document.getElementById(image));
+        }
+    </script>
+
 </head>
 
 <body>
@@ -45,94 +58,14 @@
             </div>
         </div>
 
-        <!-- {% for row in range(8) %}
-            {% for col in range(8) %}
-                {% if (col + row) % 2 == 0 %}
-                    <div class="box">
-                    {{ board[row][col] }}
-                    </div>
-                {% endif %}
-                {% if (col + row) % 2 == 1 %}
-                    <div class="box">
-                    {{ board[row][col] }}
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% endfor %} -->
+        {% for row in range(8) %} {% for col in range(8) %}
 
-        <div class="box"><img class="piece" src="{{url_for('static', filename='/pictures/bb.svg')}}" /></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+        <div class="box" id="grid_box_{{13*row+col}}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% if board[col][row].name %}
+            <img id="chess_image_{{13*row+col}}" class="piece" draggable="ture" ondragstart="drag(event)" src="/static/pictures/{{board[col][row].name}}.svg"> {% endif %}
+        </div>
 
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
-
+        {% endfor %} {% endfor %}
 
         <div class="right_side">
             <div class="box-side">8</div>
@@ -164,6 +97,4 @@
 </body>
 
 </html>
-{% endblock %} 
-
-{% block body %} {% endblock %}
+{% endblock %} {% block body %} {% endblock %}
