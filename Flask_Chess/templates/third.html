@@ -45,30 +45,20 @@
             </div>
         </div>
 
-        <!-- {% for row in range(8) %}
+        {% for row in range(8) %}
             {% for col in range(8) %}
-                {% if (col + row) % 2 == 0 %}
-                    <div class="box">
-                    {{ board[row][col] }}
-                    </div>
+                
+                <div class="box">
+                {% if board[col][row].name %}
+                    <img class="piece" src="/static/pictures/{{board[col][row].name}}.svg">
                 {% endif %}
-                {% if (col + row) % 2 == 1 %}
-                    <div class="box">
-                    {{ board[row][col] }}
-                    </div>
-                {% endif %}
+                </div>
+                
+                
             {% endfor %}
-        {% endfor %} -->
+        {% endfor %}
 
-        <div class="box"><img class="piece" src="{{url_for('static', filename='/pictures/bb.svg')}}" /></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-
-        <div class="box"></div>
+        <!-- <div class="box"></div>
         <div class="box"></div>
         <div class="box"></div>
         <div class="box"></div>
@@ -132,6 +122,14 @@
         <div class="box"></div>
 
         <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div> -->
+
 
 
         <div class="right_side">
