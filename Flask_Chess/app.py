@@ -142,8 +142,8 @@ class game(object):
         wq = queen(D, 1, "wq")
         wb1 = bishop(C, 1, "wb")
         wb2 = bishop(F, 1, "wb")
-        wh1 = knight(B, 1, "wh")
-        wh2 = knight(G, 1, "wh")
+        wn1 = knight(B, 1, "wn")
+        wn2 = knight(G, 1, "wn")
         wr1 = rook(A, 1, "wr")
         wr2 = rook(H, 1, "wr")
         wp1 = pawn(A, 2, "wp")
@@ -158,8 +158,8 @@ class game(object):
         bq = queen(D, 8, "bq", 2)
         bb1 = bishop(C, 8, "bb", 2)
         bb2 = bishop(F, 8, "bb", 2)
-        bh1 = knight(B, 8, "bh", 2)
-        bh2 = knight(G, 8, "bh", 2)
+        bn1 = knight(B, 8, "bn", 2)
+        bn2 = knight(G, 8, "bn", 2)
         br1 = rook(A, 8, "br", 2)
         br2 = rook(H, 8, "br", 2)
         bp1 = pawn(A, 7, "bp", 2)
@@ -170,17 +170,17 @@ class game(object):
         bp6 = pawn(F, 7, "bp", 2)
         bp7 = pawn(G, 7, "bp", 2)
         bp8 = pawn(H, 7, "bp", 2)
-        self.w_pcs = [wk, wq, wb1, wb2, wh1, wh2, wr1, wr2, wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8]
-        self.b_pcs = [bk, bq, bb1, bb2, bh1, bh2, br1, br2, bp1, bp2, bp3, bp4, bp5, bp6, bp7, bp8]
+        self.w_pcs = [wk, wq, wb1, wb2, wn1, wn2, wr1, wr2, wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8]
+        self.b_pcs = [bk, bq, bb1, bb2, bn1, bn2, br1, br2, bp1, bp2, bp3, bp4, bp5, bp6, bp7, bp8]
         self.board1 = [
-                    [br1, bh1, bb1, bq, bk, bb2, bh2, br2],
+                    [br1, bn1, bb1, bq, bk, bb2, bn2, br2],
                     [bp1, bp2, bp3, bp4, bp5, bp6, bp7, bp8],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [wp1, wp2, wp3, wp4, wp5, wp6, wp7, wp8],
-                    [wr1, wh1, wb1, wq, wk, wb2, wh2, wr2]
+                    [wr1, wn1, wb1, wq, wk, wb2, wn2, wr2]
                 ]  
 
 @app.route('/')

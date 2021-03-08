@@ -9,21 +9,7 @@
     <meta charset="UTF-8">
     <title>Chess</title>
 
-    <script>
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
-
-        function drag(ev) {
-            ev.dataTransfer.setData("content", ev.target.id);
-        }
-
-        function drop(ev) {
-            ev.preventDefault();
-            var image = ev.dataTransfer.getData("content");
-            ev.target.appendChild(document.getElementById(image));
-        }
-    </script>
+    <script src="{{url_for('static', filename='js/board.js')}}" async defer></script>
 
 </head>
 
@@ -58,14 +44,11 @@
             </div>
         </div>
 
-        {% for row in range(8) %} {% for col in range(8) %}
-
-        <div class="box" id="grid_box_{{13*row+col}}" ondrop="drop(event)" ondragover="allowDrop(event)">
-            {% if board[col][row].name %}
-            <img id="chess_image_{{13*row+col}}" class="piece" draggable="ture" ondragstart="drag(event)" src="/static/pictures/{{board[col][row].name}}.svg"> {% endif %}
-        </div>
-
-        {% endfor %} {% endfor %}
+        {%for i in range(0, 8)%} {%for j in range(0, 8)%} {%if board[j][i] != 0%}
+        <div class="box" id="grid_box_{{13*i+j}}" ondrop="drop(event)" ondragover="allowDrop(event)"><img id="chess_image_{{13*i+j}}" class="piece" draggable="ture" ondragstart="drag(event)" src="{{url_for('static', filename='/pictures/' + images[board[j][i]] + '.svg')}}" /></div>
+        {%else%}
+        <div class="box" id="grid_box_{{13*i+j}}" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        {%endif%} {%endfor%} {%endfor%}
 
         <div class="right_side">
             <div class="box-side">8</div>
