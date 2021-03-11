@@ -93,7 +93,7 @@ function SendPos( old_pos, new_pos ) {
             var response = JSON.parse( req.responseText )
             document.getElementById( 'myDiv' )
                 .innerHTML = response.old_position + " -> " + response.new_position
-            if ( response.allowed == false ) {
+            if ( response.allowed == false || response.restart == "refresh" ) {
                 location.reload( )
             }
         }

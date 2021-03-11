@@ -6,6 +6,13 @@ app = Flask(__name__)
 images = {1:"br", 2:"bn", 3:"bb", 4:"bq", 5:"bk", 6:"bp", 7:"wr", 8:"wn", 9:"wb", 10:"wq", 11:"wk", 12:"wp"}
 
 class piece:
+    """ The super class for all piece types.
+        x = x position on board, each space is assigned an x,y position e.g. A1 is 1,1
+        y = y position on board
+        col = color, 1 for white, 2 for black
+        active = True if piece is on board, False if it has been removed or taken
+        moved = True if pieces has been moved, False if not (used for pawn first move and castling)
+    """
     def __init__(self, x, y, name, col=1):
         self.x = x
         self.y = y
@@ -30,23 +37,41 @@ class piece:
 class pawn(piece):
     def __init__(self, x, y, name, col=1):
         self.type = 'P'
+        self.passant = False
+        print("SETTING INIT FLASE")
         super().__init__(x, y, name, col)
 
+    def move(self, new_x, new_y):
+        if self.moved == False:
+            self.passant = True
+            print("SETTING True")
+        else:
+            self.passant = False
+            print("SETTING False")
+        super().move(new_x, new_y)
+
     def legal(self, new_x, new_y, taking=False):
+        # pawn can only move forward, fact equation maps color to direction (1 for white and -1 for black moving up and down the board respectively)
         fact = -2*self.col+3
+        # pawns move is directional, therefore no abs val
         xdif = new_x - self.x
         ydif = new_y - self.y
+        # on the pawn's first move, it can move forward two spaces if not taking a piece
         if (not taking) and (not self.moved) and xdif == 0 and ydif == 2*fact:
+            self.passant = True
+            print("passant_inside = ", self.passant)
+            print("self.moved = ", self.moved)
             return True
         elif taking:
+            # if the pawn is taking it can move diagonally either way 1 space
             if abs(xdif) == 1 and ydif == fact:
                 return True
             else:
                 return False
+        # if not taking and not moving directly forward one space, move is illegal
         elif not (xdif == 0 and ydif == fact):
             return False
         return True
-
 
 class rook(piece):
     def __init__(self, x, y, name, col=1):
@@ -54,20 +79,25 @@ class rook(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
+        # rook can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
+        # rook can only move straight
         if not (xdif == 0 or ydif == 0):
             return False
         return True
 
 class knight(piece):
     def __init__(self, x, y, name, col=1):
-        self.type = 'N'
+        self.type = 'N'  # type is "N" so as not to be confused with king
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
+        # knight can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
+        print("xdif = {0}\n ydif = {1}   in legal in knight".format(xdif, ydif))
+        # knight is legal if making l-shape, after abs val there are 2 scenarios
         if not ((xdif == 2 and ydif == 1) or (xdif == 1 and ydif == 2)):
             return False
         return True
@@ -78,20 +108,31 @@ class bishop(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
+        
+        print("bishop taking = ", taking)
+        
+        # bishop can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
+        # bishop can only move diagonally
         if not xdif == ydif:
             return False
         return True
 
 class king(piece):
+    """ each class has a string assigned to type in order to determine its type in other functions
+        each class inherits from piece and uses the super() call to initialize all attributes except type
+        legal methods do not include castling (handle in Game class functions) because multiple pieces move
+    """
     def __init__(self, x, y, name, col=1):
         self.type = 'K'
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
+        # king can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
+        # return false only if either direction is moving more than 1 space
         if not (xdif <= 1 and ydif <= 1):
             return False
         return True
@@ -102,12 +143,15 @@ class queen(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
+        # queen can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
+        # queen is legal if move is diagonal or straight, hence the 3 cases
         if not (xdif == ydif or xdif == 0 or ydif == 0):
             return False
         return True
     
+############################
 
 ROWS = '12345678'
 COLS = 'ABCDEFGHabcdefgh'
@@ -191,38 +235,58 @@ class table:
             start = min(coords[1], coords[3])
             for i in range(start + 1, start + abs(coords[1] - coords[3])):
                 if self.board[coords[0]][i].name != "--":
+                    print("check betwen fn when equal y")
                     return True
                 
         if(coords[1] == coords[3]):
             start = min(coords[0], coords[2])
             for i in range(start + 1, start + abs(coords[0] - coords[2])):
                 if self.board[i][coords[1]].name != "--":
+                    print("check betwen fn when equal x")
                     return True
         return False
     
     def check_taking(self, p1_y, p1_x, p2_y, p2_x):
+        if self.board[p1_y][p1_x].name[1] == 'p' and self.board[p1_y][p2_x].name[1] == 'p' and p1_x - p2_x != 0:
+            if self.board[p1_y][p2_x].passant:
+                return True
+            
         if (self.board[p1_y][p1_x].name != "--"
         and self.board[p2_y][p2_x].name != "--" 
         and self.board[p1_y][p1_x].name[0] != self.board[p2_y][p2_x].name[0]):
+            print("taking true")
             return True
+        print("taking false")
         return False
     
     def check_turn(self, color):
+        print("color input = ", color)
         if self.turn % 2 == 0 and color == 2:
+            print("black")
             self.turn += 1
             return True
         if self.turn % 2 == 1 and color == 1:
+            print("wite")
             self.turn += 1
             return True
+        print("wrong color")
         return False
     
     def check_legal(self, oldcol, oldrow, newcol, newrow):
-        if (self.board[oldcol][oldrow].legal(newrow+1, filter_y[newcol], self.check_taking(oldcol, oldrow, newcol, newrow))
+        taking = self.check_taking(oldcol, oldrow, newcol, newrow)
+        
+        if (self.board[oldcol][oldrow].legal(newrow+1, filter_y[newcol], taking)
         and not self.check_for_pieces_between(oldcol, oldrow, newcol, newrow)
         and self.board[oldcol][oldrow].name[0] != self.board[newcol][newrow].name[0]
         and self.check_turn(self.board[oldcol][oldrow].col)):
             self.board[oldcol][oldrow].move(newrow+1, filter_y[newcol])
-            self.board[newcol][newrow].taken()
+            if taking:
+                if self.board[oldcol][newrow].name[1] == "p":
+                    if self.board[oldcol][newrow].passant:
+                        self.board[oldcol][newrow].taken()
+                        self.board[oldcol][newrow] = piece(None, None, "--", None)
+                else:
+                    self.board[newcol][newrow].taken()
             return True
         else:
             return False
@@ -240,7 +304,6 @@ class table:
         return False
     
     def convert_input_string_to_coordinates(self, first, second):
-        
         fir_y = filter_y[int(first[1])]
         fir_x = ltn[first[0]]
         sec_y = filter_y[int(second[1])]
@@ -252,8 +315,45 @@ class table:
         first = ntl[first_x] + str(filter_y[first_y])
         second = ntl[second_x] + str(filter_y[second_y])
         return [first, second]
-        
     
+    def castle(self, move):
+        turn = self.turn % 2
+        kings_rooks = ["wk", "wr", "bk", "br"]
+        if move == "0-0":
+            x1 = 1
+            x2 = -1
+        else:
+            x1 = 2
+            x2 = -1
+            
+        if turn == 1:
+            if move == "0-0":
+                coords = self.convert_input_string_to_coordinates("e1", "h1")
+            if move == "0-0-0":
+                coords = self.convert_input_string_to_coordinates("a1", "e1")
+        if turn == 0:
+            if move == "0-0":
+                coords = self.convert_input_string_to_coordinates("e8", "h8")
+            if move == "0-0-0":
+                coords = self.convert_input_string_to_coordinates("a8", "e8")
+        
+        if (not self.check_for_pieces_between(coords[0], coords[1], coords[2], coords[3])
+            and not self.board[coords[0]][coords[1]].moved
+            and not self.board[coords[2]][coords[3]].moved
+            and self.board[coords[0]][coords[1]].name in kings_rooks
+            and self.board[coords[2]][coords[3]].name in kings_rooks):
+                self.board[coords[0]][coords[1]].move(coords[3]+x2, filter_y[coords[2]])
+                self.board[coords[2]][coords[3]].move(coords[1]+x1, filter_y[coords[0]])
+                self.board[coords[0]][coords[1]+x1], self.board[coords[2]][coords[3]+x2] = self.board[coords[2]][coords[3]], self.board[coords[0]][coords[1]]
+                self.board[coords[0]][coords[1]] = piece(None, None, "--", None)
+                self.board[coords[2]][coords[3]] = piece(None, None, "--", None)
+                self.turn += 1
+                print("Legal")
+                return True
+        print("Not Legal")
+        return False    
+        
+        
     def get_move_input(self, start, end=""):
         print("\nNewMove: {} -> {}\n".format(start, end))
         if(type(start) == type(end) == str and end != ""):
@@ -264,11 +364,12 @@ class table:
             
             coords = self.convert_input_string_to_coordinates(start, end)
             
+            print("coords = ", coords)
+            
             return self.check_move(coords[0], coords[1], coords[2], coords[3])
         
         elif start == "0-0" or start == "0-0-0":
-            print("CASTLE FUNCTION NOT READY")
-            return True
+            return self.castle(start)
         else:
             print("Wrong input handed, Please enter strings, e.g. (\"A1\",\"A2\") ")
             return False
@@ -304,10 +405,19 @@ def ajax_request():
 
     if old_pos != "" and new_pos != "":
         coordinates = game.convert_coordinates_to_string(old_pos_x, old_pos_y, new_pos_x, new_pos_y)
+        if ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
+        and (coordinates[1][0] == "A" or coordinates[0][0] == "A")):
+            allowed = game.get_move_input("0-0-0")
+            restart = "refresh"
+        elif ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
+        and (coordinates[1][0] == "H" or coordinates[0][0] == "H")):
+            allowed = game.get_move_input("0-0")
+            restart = "refresh"
+        else:
+            allowed = game.get_move_input(coordinates[0], coordinates[1])
     else:
         coordinates = ["","","",""]
-
-    allowed = game.get_move_input(coordinates[0], coordinates[1])
+        allowed = False
 
     return jsonify(old_position=coordinates[0], new_position=coordinates[1], allowed=allowed, restart=restart)
 
