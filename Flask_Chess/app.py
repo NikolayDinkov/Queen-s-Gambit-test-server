@@ -4,17 +4,8 @@ from flask import render_template, request, redirect, make_response, url_for, fl
 app = Flask(__name__)
 
 images = {1:"br", 2:"bn", 3:"bb", 4:"bq", 5:"bk", 6:"bp", 7:"wr", 8:"wn", 9:"wb", 10:"wq", 11:"wk", 12:"wp"}
-board = [[0 for x in range(8)] for y in range(8)]
-
 
 class piece:
-    """ The super class for all piece types.
-        x = x position on board, each space is assigned an x,y position e.g. A1 is 1,1
-        y = y position on board
-        col = color, 1 for white, 2 for black
-        active = True if piece is on board, False if it has been removed or taken
-        moved = True if pieces has been moved, False if not (used for pawn first move and castling)
-    """
     def __init__(self, x, y, name, col=1):
         self.x = x
         self.y = y
@@ -42,27 +33,16 @@ class pawn(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
-        # pawn can only move forward, fact equation maps color to direction (1 for white and -1 for black moving up and down the board respectively)
         fact = -2*self.col+3
-        print("fact = {}    in legal in pawn".format(fact))
-        # pawns move is directional, therefore no abs val
-        print("new_y = ", new_y)
-        print("new_x = ", new_x)
-        print("self.y = ", self.y)
-        print("self.x = ", self.x)
         xdif = new_x - self.x
         ydif = new_y - self.y
-        print("xdif = {0}\n ydif = {1}   in legal in pawn".format(xdif, ydif))
-        # on the pawn's first move, it can move forward two spaces if not taking a piece
         if (not taking) and (not self.moved) and xdif == 0 and ydif == 2*fact:
             return True
         elif taking:
-            # if the pawn is taking it can move diagonally either way 1 space
             if abs(xdif) == 1 and ydif == fact:
                 return True
             else:
                 return False
-        # if not taking and not moving directly forward one space, move is illegal
         elif not (xdif == 0 and ydif == fact):
             return False
         return True
@@ -74,25 +54,20 @@ class rook(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
-        # rook can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
-        # rook can only move straight
         if not (xdif == 0 or ydif == 0):
             return False
         return True
 
 class knight(piece):
     def __init__(self, x, y, name, col=1):
-        self.type = 'N'  # type is "N" so as not to be confused with king
+        self.type = 'N'
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
-        # knight can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
-        print("xdif = {0}\n ydif = {1}   in legal in knight".format(xdif, ydif))
-        # knight is legal if making l-shape, after abs val there are 2 scenarios
         if not ((xdif == 2 and ydif == 1) or (xdif == 1 and ydif == 2)):
             return False
         return True
@@ -103,28 +78,20 @@ class bishop(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
-        # bishop can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
-        # bishop can only move diagonally
         if not xdif == ydif:
             return False
         return True
 
 class king(piece):
-    """ each class has a string assigned to type in order to determine its type in other functions
-        each class inherits from piece and uses the super() call to initialize all attributes except type
-        legal methods do not include castling (handle in Game class functions) because multiple pieces move
-    """
     def __init__(self, x, y, name, col=1):
         self.type = 'K'
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
-        # king can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
-        # return false only if either direction is moving more than 1 space
         if not (xdif <= 1 and ydif <= 1):
             return False
         return True
@@ -135,23 +102,19 @@ class queen(piece):
         super().__init__(x, y, name, col)
 
     def legal(self, new_x, new_y, taking=False):
-        # queen can move in any direction so abs val of move is taken
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
-        # queen is legal if move is diagonal or straight, hence the 3 cases
         if not (xdif == ydif or xdif == 0 or ydif == 0):
             return False
         return True
     
-############################
-
 ROWS = '12345678'
 COLS = 'ABCDEFGHabcdefgh'
-A, B, C, D, E, F, G, H = 0, 1, 2, 3, 4, 5, 6, 7
+A, B, C, D, E, F, G, H = 1, 2, 3, 4, 5, 6, 7, 8
 
 ltn = {'A':0, 'a':0, 'B':1, 'b':1, 'C':2, 'c':2, 'D':3, 'd':3, 'E':4, 'e':4, 'F':5, 'f':5, 'G':6, 'g':6, 'H':7, 'h':7}
-filter_y = {7:1, 6:2, 5:3, 4:4, 3:5, 2:6, 1:7, 0:8}
-filter_y_rev = {1:7, 2:6, 3:5, 4:4, 5:3, 6:2, 7:1, 8:0}
+ntl = {0:'A', 1:'B', 2:'C', 3:'D', 4:'E', 5:'F', 6:'G', 7:'H'}
+filter_y = {8:0, 7:1, 6:2, 5:3, 4:4, 3:5, 2:6, 1:7, 0:8}
 
 class table:
     def __init__(self):
@@ -217,46 +180,50 @@ class table:
     def check_for_pieces_between(self, first_col, first_row, second_col, second_row):
         coords = [first_col, first_row, second_col, second_row]
         
-        for i in range(4):
-            print("coords[{}] = {}".format(i, coords[i]))
+        abs_x = abs(coords[1]-coords[3])
+        abs_y = abs(coords[0]-coords[2])
         
-        if(abs(coords[0]-coords[2]) == abs(coords[1]-coords[3])):
-            return True
+        if(abs_x == abs_y):
+            start_x = min(coords[1], coords[3])
+            start_y = max(coords[0], coords[2])
+            for i in range(start_x + 1, start_x + abs_x):
+                if self.board[start_y - (i - start_x)][i].name != "--":
+                    return True
         
         if(coords[0] == coords[2]):
             start = min(coords[1], coords[3])
             for i in range(start + 1, start + abs(coords[1] - coords[3])):
                 if self.board[coords[0]][i].name != "--":
-                    print("check betwen fn when equal y")
                     return True
                 
         if(coords[1] == coords[3]):
             start = min(coords[0], coords[2])
             for i in range(start + 1, start + abs(coords[0] - coords[2])):
                 if self.board[i][coords[1]].name != "--":
-                    print("check betwen fn when equal x")
                     return True
         return False
     
-    def check_legal(self, oldcol, oldrow, newcol, newrow):
-        print("self.board[oldcol][oldrow].name = ", self.board[oldcol][oldrow].name)
-        print("self.board[newcol][newrow].name = ", self.board[newcol][newrow].name)
-        
-        if self.board[oldcol][oldrow].name == "--":
-            return False
-        if self.board[oldcol][oldrow].legal(newrow, filter_y[newcol]) == False:
-            return False
-        if self.check_for_pieces_between(oldcol, oldrow, newcol, newrow):
-            return False
-        if self.board[newcol][newrow].name == "--" and self.board[newcol][newrow].name[0] != self.board[oldcol][oldrow].name[0]:
+    def check_taking(self, p1_y, p1_x, p2_y, p2_x):
+        if (self.board[p1_y][p1_x].name != "--"
+        and self.board[p2_y][p2_x].name != "--" 
+        and self.board[p1_y][p1_x].name[0] != self.board[p2_y][p2_x].name[0]):
             return True
         return False
+    
+    def check_legal(self, oldcol, oldrow, newcol, newrow):
+        if (self.board[oldcol][oldrow].legal(newrow+1, filter_y[newcol], self.check_taking(oldcol, oldrow, newcol, newrow))
+        and not self.check_for_pieces_between(oldcol, oldrow, newcol, newrow)
+        and self.board[oldcol][oldrow].name[0] != self.board[newcol][newrow].name[0]):
+            self.board[oldcol][oldrow].move(newrow+1, filter_y[newcol])
+            self.board[newcol][newrow].taken()
+            return True
+        else:
+            return False
 
     def checkmate(self):
         pass
 
-    def check_move(self, oldcol, oldrow, newcol, newrow):
-        
+    def check_move(self, oldcol, oldrow, newcol, newrow):     
         if self.check_legal(oldcol, oldrow, newcol, newrow):
             self.board[newcol][newrow] = self.board[oldcol][oldrow]
             self.board[oldcol][oldrow] = piece(None, None, "--", None)
@@ -266,11 +233,18 @@ class table:
         return False
     
     def convert_input_string_to_coordinates(self, first, second):
+        fir_y = filter_y[int(first[1])]
         fir_x = ltn[first[0]]
-        fir_y = filter_y_rev[int(first[1])]
+        sec_y = filter_y[int(second[1])]
         sec_x = ltn[second[0]]
-        sec_y = filter_y_rev[int(second[1])]
+
         return [fir_y, fir_x, sec_y, sec_x]
+    
+    def convert_coordinates_to_string(self, first_x, first_y, second_x, second_y):
+        first = ntl[first_x] + str(filter_y[first_y])
+        second = ntl[second_x] + str(filter_y[second_y])
+        return [first, second]
+        
     
     def get_move_input(self, start, end=""):
         print("\nNewMove: {} -> {}\n".format(start, end))
@@ -281,6 +255,9 @@ class table:
                 return False
             
             coords = self.convert_input_string_to_coordinates(start, end)
+            
+            print("coords = ", coords)
+            
             return self.check_move(coords[0], coords[1], coords[2], coords[3])
         
         elif start == "0-0" or start == "0-0-0":
@@ -289,53 +266,50 @@ class table:
         else:
             print("Wrong input handed, Please enter strings, e.g. (\"A1\",\"A2\") ")
             return False
+    
+game = table()
 
-
-@app.route('/')
-def first_page():
-    for i in range(1,6):
-        board[0][i-1] = i
-        board[7][i-1] = 6+i
-    for i in range(3,0,-1):
-        board[0][5+3-i] = i
-        board[7][5+3-i] = 6+i
-    for i in range(0,8):
-        board[1][i] = 6
-        board[6][i] = 12
-
-    return render_template("display_board.html", board=board, images=images)
-
-@app.route('/2')
-def second_page():
-    for i in range(1,6):
-        board[0][i-1] = i
-        board[7][i-1] = 6+i
-    for i in range(3,0,-1):
-        board[0][5+3-i] = i
-        board[7][5+3-i] = 6+i
-    for i in range(0,8):
-        board[1][i] = 6
-        board[6][i] = 12
-
-    return render_template("index.html", board=board, images=images)
-
-
-@app.route('/3', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def third_page():
     if request.method == "POST":
         return "OK"
-    game = table()
     print(game.board[0][0].name)
 
-    return render_template('third.html', board=game.board)
+    return render_template('index.html', board=game.board)
 
 
 @app.route('/ajax', methods = ['POST'])
 def ajax_request():
-    position = request.form['position']
-    position = position[9:]
-    print(position)
-    return jsonify(position=position)
+    old_pos_x = ""
+    old_pos_y = ""
+    new_pos_x = ""
+    new_pos_y = ""
+
+    old_pos = request.form['old_pos']
+    if old_pos != "":
+        old_pos_x = int(old_pos[9])
+        old_pos_y = int(old_pos[10])
+
+    new_pos = request.form['new_pos']
+    if new_pos != "":
+        new_pos_x = int(new_pos[9])
+        new_pos_y = int(new_pos[10])
+
+    restart = request.form['restart']
+    if restart == "True":
+        global game
+        game = table()
+        print("OK")
+
+
+    if old_pos != "" and new_pos != "":
+        coordinates = game.convert_coordinates_to_string(old_pos_x, old_pos_y, new_pos_x, new_pos_y)
+    else:
+        coordinates = ["","","",""]
+
+    allowed = game.get_move_input(coordinates[0], coordinates[1])
+
+    return jsonify(old_position=coordinates[0], new_position=coordinates[1], allowed=allowed, restart=restart)
 
 if __name__ == '__main__':
     app.run(debug=True)

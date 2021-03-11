@@ -1,8 +1,10 @@
 //"use strict";
 
-function drag( ev ) {
-    loadXMLDoc( ev.target.parentNode.id )
+var old_pos;
+var new_pos;
 
+function drag( ev ) {
+    old_pos = ev.target.parentNode.id
     ev.dataTransfer.setData( "text", ev.target.id );
     let bcolor = window.getComputedStyle( document.getElementById( ev.target.parentNode.id ) )
         .backgroundColor.toString( );
@@ -18,11 +20,14 @@ function allowDrop( ev ) {
 }
 
 function drop( ev ) {
+    new_pos = ev.target.id
+    if ( new_pos.includes( "image" ) ) {
+        new_pos = ev.target.parentNode.id
+    }
+    SendPos( old_pos, new_pos )
+
     let image = ev.dataTransfer.getData( "text" );
     let element = ev.target;
-    let bcolor = document.getElementById( ev.target.id )
-        .style.backgroundColor
-
     ev.preventDefault( );
     if ( element.id.search( "grid" ) >= 0 ) {
         element.appendChild( document.getElementById( image ) );
@@ -61,59 +66,63 @@ function dragLeave( ev ) {
     }
 }
 
-
-
-
-
-
-
-
 /*++++++++++++++++++++++++++++++++++++*/
 
+function GetMyData( data ) {
+    alert( "data = ", data )
+    return data;
+}
 
-function loadXMLDoc( pos ) {
+function Restart( old_pos, new_pos ) {
     var req = new XMLHttpRequest( )
     req.onreadystatechange = function ( ) {
-        if ( req.readyState == 4 ) {
-            if ( req.status != 200 ) {
-                //error handling code here
-            } else {
-                var response = JSON.parse( req.responseText )
-                document.getElementById( 'myDiv' )
-                    .innerHTML = response.position
-            }
+        if ( req.readyState == 4 && req.status == 200 ) {
+            var response = JSON.parse( req.responseText )
+            console.log( response.restart )
         }
     }
-
     req.open( 'POST', '/ajax' )
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
-    var postVars = 'position=' + pos
-    req.send( postVars )
+    var variables = 'old_pos=' + "&new_pos=" + "&restart=True"
+    req.send( variables )
 
-    return false
+    return false;
 }
 
 
-/*
-function loadXMLDoc( pos ) {
+function SendPos( old_pos, new_pos ) {
     var req = new XMLHttpRequest( )
     req.onreadystatechange = function ( ) {
-        if ( req.readyState == 4 ) {
-            if ( req.status != 200 ) {
-                //error handling code here
-            } else {
-                var response = JSON.parse( req.responseText )
-                document.getElementById( 'myDiv' )
-                    .innerHTML = response.username
-            }
+        if ( req.readyState == 4 && req.status == 200 ) {
+            var response = JSON.parse( req.responseText )
+            document.getElementById( 'myDiv' )
+                .innerHTML = response.old_position + " -> " + response.new_position
+
         }
     }
-
     req.open( 'POST', '/ajax' )
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
-    var postVars = 'uname=' + pos
-    req.send( postVars )
+    var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos + "&restart=False"
+    req.send( coords )
 
-    return false
+    return false;
+}
+
+/*
+function SendPos( old_pos, new_pos ) {
+    var req = new XMLHttpRequest( )
+    req.onreadystatechange = function ( ) {
+        if ( req.readyState == 4 && req.status == 200 ) {
+            var response = JSON.parse( req.responseText )
+            document.getElementById( 'myDiv' )
+                .innerHTML = response.old_position + " -> " + response.new_position
+        }
+    }
+    req.open( 'POST', '/ajax' )
+    req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
+    var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos
+    req.send( coords )
+
+    return false;
 }
 */

@@ -14,7 +14,6 @@
 </head>
 
 <body>
-
     <div class="wrapper">
         <div class="top">
             <div class="wrapper-inner">
@@ -44,11 +43,14 @@
             </div>
         </div>
 
-        {%for i in range(0, 8)%} {%for j in range(0, 8)%} {%if board[j][i] != 0%}
-        <div class="box" id="grid_box_{{13*i+j}}" ondrop="drop(event)" ondragover="allowDrop(event)"><img id="chess_image_{{13*i+j}}" class="piece" draggable="ture" ondragstart="drag(event)" src="{{url_for('static', filename='/pictures/' + images[board[j][i]] + '.svg')}}" /></div>
-        {%else%}
-        <div class="box" id="grid_box_{{13*i+j}}" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        {%endif%} {%endfor%} {%endfor%}
+        {% for row in range(8) %} {% for col in range(8) %}
+
+        <div name="no_name" class="box" id="grid_box_{{row}}{{col}}" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+            {% if board[col][row].name != "--"%}
+            <img name="{{board[col][row].name}}" id="chess_image_{{row}}{{col}}" class="piece" draggable="ture" ondragstart="drag(event)" src="/static/pictures/{{board[col][row].name}}.svg"> {% endif %}
+        </div>
+
+        {% endfor %} {% endfor %}
 
         <div class="right_side">
             <div class="box-side">8</div>
@@ -77,6 +79,12 @@
         </div>
 
     </div>
+
+    <div id="myDiv"></div>
+    <div id="return" style="display: none;"></div>
+    <div></div>
+    <button onclick="Restart();"> restart game </button>
+
 </body>
 
 </html>
