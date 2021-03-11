@@ -1,5 +1,7 @@
 //"use strict";
 
+var socket = io( "127.0.0.1:5000/" )
+
 var old_pos;
 var new_pos;
 
@@ -68,11 +70,6 @@ function dragLeave( ev ) {
 
 /*++++++++++++++++++++++++++++++++++++*/
 
-function GetMyData( data ) {
-    alert( "data = ", data )
-    return data;
-}
-
 function Restart( old_pos, new_pos ) {
     var req = new XMLHttpRequest( )
     req.onreadystatechange = function ( ) {
@@ -81,14 +78,13 @@ function Restart( old_pos, new_pos ) {
             console.log( response.restart )
         }
     }
-    req.open( 'POST', '/ajax' )
+    req.open( 'POST', '/ajax', false )
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
     var variables = 'old_pos=' + "&new_pos=" + "&restart=True"
     req.send( variables )
 
     return false;
 }
-
 
 function SendPos( old_pos, new_pos ) {
     var req = new XMLHttpRequest( )
@@ -97,16 +93,38 @@ function SendPos( old_pos, new_pos ) {
             var response = JSON.parse( req.responseText )
             document.getElementById( 'myDiv' )
                 .innerHTML = response.old_position + " -> " + response.new_position
-
+            if ( response.allowed == false ) {
+                location.reload( )
+            }
         }
     }
-    req.open( 'POST', '/ajax' )
+    req.open( 'POST', '/ajax', true )
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
     var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos + "&restart=False"
     req.send( coords )
 
     return false;
 }
+
+
+/*
+function Restart( old_pos, new_pos ) {
+    var req = new XMLHttpRequest( )
+    req.onreadystatechange = function ( ) {
+        if ( req.readyState == 4 && req.status == 200 ) {
+            var response = JSON.parse( req.responseText )
+            console.log( response.restart )
+        }
+    }
+    req.open( 'POST', '/ajax', false )
+    req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
+    var variables = 'old_pos=' + "&new_pos=" + "&restart=True"
+    req.send( variables )
+
+    return false;
+}
+*/
+
 
 /*
 function SendPos( old_pos, new_pos ) {
@@ -118,11 +136,35 @@ function SendPos( old_pos, new_pos ) {
                 .innerHTML = response.old_position + " -> " + response.new_position
         }
     }
-    req.open( 'POST', '/ajax' )
+    req.open( 'POST', '/ajax', true )
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
-    var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos
+    var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos + "&restart=False"
     req.send( coords )
 
     return false;
+}
+*/
+
+/*
+function drop( ev ) {
+    new_pos = ev.target.id
+    if ( new_pos.includes( "image" ) ) {
+        new_pos = ev.target.parentNode.id
+    }
+    SendPos( old_pos, new_pos )
+
+    let image = ev.dataTransfer.getData( "text" );
+    let element = ev.target;
+    ev.preventDefault( );
+    if ( element.id.search( "grid" ) >= 0 ) {
+        element.appendChild( document.getElementById( image ) );
+    } else if ( document.getElementById( image )
+        .name[ 0 ] != element.name[ 0 ] ) {
+        if ( !element.classList.contains( 'box' ) ) {
+            element = ev.target.parentNode;
+            ev.target.remove( );
+        }
+        element.appendChild( document.getElementById( image ) );
+    }
 }
 */
