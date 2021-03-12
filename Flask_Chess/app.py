@@ -325,6 +325,12 @@ class table:
             print("Wrong input handed, Please enter strings, e.g. (\"A1\",\"A2\") ")
             return False
     
+    def print_turn(self):
+        if self.turn % 2 == 0:
+            return "Black turn is"
+        else:
+            return "White turn is"
+
 game = table()
 
 @app.route('/', methods=['GET', 'POST'])
@@ -356,14 +362,65 @@ def ajax_request():
 
     if old_pos != "" and new_pos != "":
         coordinates = game.convert_coordinates_to_string(old_pos_x, old_pos_y, new_pos_x, new_pos_y)
-        if ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
-        and (coordinates[1][0] == "A" or coordinates[0][0] == "A")):
-            allowed = game.get_move_input("0-0-0")
-            restart = "refresh"
-        elif ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
-        and (coordinates[1][0] == "H" or coordinates[0][0] == "H")):
-            allowed = game.get_move_input("0-0")
-            restart = "refresh"
+        if (game.board[old_pos_y][old_pos_x].name in ["wk", "wr", "bk", "br"]
+        and game.board[new_pos_y][new_pos_x].name in ["wk", "wr", "bk", "br"]):
+            if ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
+            and (coordinates[1][0] == "A" or coordinates[0][0] == "A")):
+                allowed = game.get_move_input("0-0-0")
+            elif ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
+            and (coordinates[1][0] == "H" or coordinates[0][0] == "H")):
+                allowed = game.get_move_input("0-0")
+        else:
+            allowed = game.get_move_input(coordinates[0], coordinates[1])
+    else:
+        coordinates = ["","","",""]
+        allowed = False
+
+    turn = game.print_turn()
+    print("allowed = ",allowed)
+
+    return jsonify({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+"""
+@app.route('/ajax', methods = ['POST', 'GET'])
+def ajax_request():
+    old_pos_x = ""
+    old_pos_y = ""
+    new_pos_x = ""
+    new_pos_y = ""
+
+    old_pos = request.form['old_pos']
+    if old_pos != "":
+        old_pos_x = int(old_pos[9])
+        old_pos_y = int(old_pos[10])
+
+    new_pos = request.form['new_pos']
+    if new_pos != "":
+        new_pos_x = int(new_pos[9])
+        new_pos_y = int(new_pos[10])
+
+    restart = request.form['restart']
+    if restart == "True":
+        global game
+        game = table()
+
+    if old_pos != "" and new_pos != "":
+        coordinates = game.convert_coordinates_to_string(old_pos_x, old_pos_y, new_pos_x, new_pos_y)
+        if (game.board[old_pos_y][old_pos_x].name in ["wk", "wr", "bk", "br"]
+        and game.board[new_pos_y][new_pos_x].name in ["wk", "wr", "bk", "br"]):
+            if ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
+            and (coordinates[1][0] == "A" or coordinates[0][0] == "A")):
+                allowed = game.get_move_input("0-0-0")
+                restart = "refresh"
+            elif ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
+            and (coordinates[1][0] == "H" or coordinates[0][0] == "H")):
+                allowed = game.get_move_input("0-0")
+                restart = "refresh"
         else:
             allowed = game.get_move_input(coordinates[0], coordinates[1])
     else:
@@ -372,5 +429,4 @@ def ajax_request():
 
     return jsonify(old_position=coordinates[0], new_position=coordinates[1], allowed=allowed, restart=restart)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+"""

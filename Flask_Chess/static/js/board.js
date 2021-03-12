@@ -1,13 +1,11 @@
 //"use strict";
 
-var socket = io( "127.0.0.1:5000/" )
-
 var old_pos;
 var new_pos;
 
 function drag( ev ) {
     old_pos = ev.target.parentNode.id
-    ev.dataTransfer.setData( "text", ev.target.id );
+    ev.dataTransfer.setData( "img", ev.target.id );
     let bcolor = window.getComputedStyle( document.getElementById( ev.target.parentNode.id ) )
         .backgroundColor.toString( );
     if ( bcolor == "rgb(181, 221, 95)" ) {
@@ -22,25 +20,55 @@ function allowDrop( ev ) {
 }
 
 function drop( ev ) {
+    let bcolor = window.getComputedStyle( document.getElementById( ev.target.id ) )
+        .backgroundColor
+        .toString( );
+    let image = ev.dataTransfer.getData( "img" );
+    let element = ev.target;
+    var al = false;
+    ev.preventDefault( );
     new_pos = ev.target.id
     if ( new_pos.includes( "image" ) ) {
         new_pos = ev.target.parentNode.id
     }
-    SendPos( old_pos, new_pos )
-
-    let image = ev.dataTransfer.getData( "text" );
-    let element = ev.target;
-    ev.preventDefault( );
-    if ( element.id.search( "grid" ) >= 0 ) {
-        element.appendChild( document.getElementById( image ) );
-    } else if ( document.getElementById( image )
-        .name[ 0 ] != element.name[ 0 ] ) {
-        if ( !element.classList.contains( 'box' ) ) {
-            element = ev.target.parentNode;
-            ev.target.remove( );
-        }
-        element.appendChild( document.getElementById( image ) );
-    }
+    $.ajax( {
+            url: "/ajax",
+            method: "POST",
+            data: {
+                "old_pos": old_pos,
+                "new_pos": new_pos,
+                "restart": "False"
+            },
+            async: false
+        } )
+        .done( function ( data ) {
+            al = data.allowed
+            $( "#myDiv" )
+                .html( data.old_position + " -> " + data.new_position )
+            let bcolor = window.getComputedStyle( document.getElementById( ev.target.id ) )
+                .backgroundColor
+                .toString( );
+            if ( bcolor == "rgb(181, 221, 95)" ) {
+                ev.target.style.backgroundColor = "rgb(181, 145, 95)";
+            } else {
+                ev.target.style.backgroundColor = "rgb(68, 26, 3)";
+            }
+            if ( !al ) {
+                $( "#myDiv" )
+                    .html( data.turn )
+                return true
+            }
+            if ( element.id.search( "grid" ) >= 0 ) {
+                element.appendChild( document.getElementById( image ) );
+            } else if ( document.getElementById( image )
+                .name[ 0 ] != element.name[ 0 ] ) {
+                if ( !element.classList.contains( 'box' ) ) {
+                    element = ev.target.parentNode;
+                    ev.target.remove( );
+                }
+                element.appendChild( document.getElementById( image ) );
+            }
+        } );
 }
 
 function dragEnter( ev ) {
@@ -86,26 +114,6 @@ function Restart( old_pos, new_pos ) {
     return false;
 }
 
-function SendPos( old_pos, new_pos ) {
-    var req = new XMLHttpRequest( )
-    req.onreadystatechange = function ( ) {
-        if ( req.readyState == 4 && req.status == 200 ) {
-            var response = JSON.parse( req.responseText )
-            document.getElementById( 'myDiv' )
-                .innerHTML = response.old_position + " -> " + response.new_position
-            if ( response.allowed == false || response.restart == "refresh" ) {
-                location.reload( )
-            }
-        }
-    }
-    req.open( 'POST', '/ajax', true )
-    req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
-    var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos + "&restart=False"
-    req.send( coords )
-
-    return false;
-}
-
 
 /*
 function Restart( old_pos, new_pos ) {
@@ -166,5 +174,60 @@ function drop( ev ) {
         }
         element.appendChild( document.getElementById( image ) );
     }
+}
+*/
+
+
+/*
+function drop( ev ) {
+    let bcolor = window.getComputedStyle( document.getElementById( ev.target.id ) )
+        .backgroundColor
+        .toString( );
+    let image = ev.dataTransfer.getData( "text" );
+    let element = ev.target;
+    var al = false;
+    ev.preventDefault( );
+    new_pos = ev.target.id
+    if ( new_pos.includes( "image" ) ) {
+        new_pos = ev.target.parentNode.id
+    }
+    $.ajax( {
+            url: "/ajax",
+            method: "POST",
+            data: {
+                "old_pos": old_pos,
+                "new_pos": new_pos,
+                "restart": "False"
+            },
+            async: false
+        } )
+        .done( function ( data ) {
+            al = data.allowed
+            $( "#myDiv" )
+                .html( data.old_position + " -> " + data.new_position )
+            let bcolor = window.getComputedStyle( document.getElementById( ev.target.id ) )
+                .backgroundColor
+                .toString( );
+            if ( bcolor == "rgb(181, 221, 95)" ) {
+                ev.target.style.backgroundColor = "rgb(181, 145, 95)";
+            } else {
+                ev.target.style.backgroundColor = "rgb(68, 26, 3)";
+            }
+            if ( !al ) {
+                $( "#myDiv" )
+                    .html( "WRONG MOVE!!!" )
+                return true
+            }
+            if ( element.id.search( "grid" ) >= 0 ) {
+                element.appendChild( document.getElementById( image ) );
+            } else if ( document.getElementById( image )
+                .name[ 0 ] != element.name[ 0 ] ) {
+                if ( !element.classList.contains( 'box' ) ) {
+                    element = ev.target.parentNode;
+                    ev.target.remove( );
+                }
+                element.appendChild( document.getElementById( image ) );
+            }
+        } );
 }
 */
