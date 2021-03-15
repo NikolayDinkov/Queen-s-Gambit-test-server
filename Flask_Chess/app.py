@@ -184,26 +184,37 @@ class table:
     def check_for_pieces_between(self, first_col, first_row, second_col, second_row):
         coords = [first_col, first_row, second_col, second_row]
         
-        abs_x = abs(coords[1]-coords[3])
-        abs_y = abs(coords[0]-coords[2])
+        abs_x = abs(coords[3]-coords[1])
+        abs_y = abs(coords[2]-coords[0])
         
-        if(abs_x == abs_y):
-            start_x = min(coords[1], coords[3])
-            start_y = max(coords[0], coords[2])
-            for i in range(start_x + 1, start_x + abs_x):
-                if self.board[start_y - (i - start_x)][i].name != "--":
+        if abs_x == abs_y:
+            
+            if coords[1] > coords[3]:
+                dif_x = -1
+            else:
+                dif_x = 1
+       
+            if coords[0] > coords[2]:
+                dif_y = -1
+            else:
+                dif_y = 1
+            
+            for i in range(abs_x - 1):
+                if self.board[coords[0] + dif_y][coords[1] + dif_x].name != "--":
                     return True
-        
+
         if(coords[0] == coords[2]):
             start = min(coords[1], coords[3])
             for i in range(start + 1, start + abs(coords[1] - coords[3])):
                 if self.board[coords[0]][i].name != "--":
+                    print("check betwen fn when equal y")
                     return True
                 
         if(coords[1] == coords[3]):
             start = min(coords[0], coords[2])
             for i in range(start + 1, start + abs(coords[0] - coords[2])):
                 if self.board[i][coords[1]].name != "--":
+                    print("check betwen fn when equal x")
                     return True
         return False
     
@@ -340,6 +351,7 @@ def index():
 
 @app.route('/ajax', methods = ['POST'])
 def ajax_request():
+    global game
     old_pos_x = ""
     old_pos_y = ""
     new_pos_x = ""
@@ -357,7 +369,6 @@ def ajax_request():
 
     restart = request.form['restart']
     if restart == "True":
-        global game
         game = table()
 
     if old_pos != "" and new_pos != "":
@@ -378,6 +389,8 @@ def ajax_request():
 
     turn = game.print_turn()
     print("allowed = ",allowed)
+
+    game.print_board()
 
     return jsonify({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn})
 
