@@ -76,6 +76,7 @@ class knight(piece):
     def legal(self, new_x, new_y, taking=False):
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
+        print("xdif = {0}\n ydif = {1}   in legal in knight".format(xdif, ydif))
         if not ((xdif == 2 and ydif == 1) or (xdif == 1 and ydif == 2)):
             return False
         return True
@@ -115,6 +116,7 @@ class queen(piece):
         if not (xdif == ydif or xdif == 0 or ydif == 0):
             return False
         return True
+    
 
 ROWS = '12345678'
 COLS = 'ABCDEFGHabcdefgh'
@@ -127,6 +129,8 @@ filter_y = {8:0, 7:1, 6:2, 5:3, 4:4, 3:5, 2:6, 1:7, 0:8}
 class table:
     def __init__(self):
         self.turn = 1
+        self.white_king = [7,4]
+        self.black_king = [0,4]
         wk = king(E, 1, "wk")
         wq = queen(D, 1, "wq")
         wb1 = bishop(C, 1, "wb")
@@ -226,16 +230,22 @@ class table:
         if (self.board[p1_y][p1_x].name != "--"
         and self.board[p2_y][p2_x].name != "--" 
         and self.board[p1_y][p1_x].name[0] != self.board[p2_y][p2_x].name[0]):
+            print("taking true")
             return True
+        print("taking false")
         return False
     
     def check_turn(self, color):
+        print("color input = ", color)
         if self.turn % 2 == 0 and color == 2:
+            print("black")
             self.turn += 1
             return True
         if self.turn % 2 == 1 and color == 1:
+            print("wite")
             self.turn += 1
             return True
+        print("wrong color")
         return False
     
     def check_legal(self, oldcol, oldrow, newcol, newrow):
@@ -245,7 +255,11 @@ class table:
         and not self.check_for_pieces_between(oldcol, oldrow, newcol, newrow)
         and self.board[oldcol][oldrow].name[0] != self.board[newcol][newrow].name[0]
         and self.check_turn(self.board[oldcol][oldrow].col)):
+            
             self.board[oldcol][oldrow].move(newrow+1, filter_y[newcol])
+            
+            print("king in check = ", self.king_in_check())
+            
             if taking:
                 if self.board[oldcol][newrow].name[1] == "p":
                     if self.board[oldcol][newrow].passant:
@@ -256,12 +270,109 @@ class table:
             return True
         else:
             return False
+    
+    def king_in_check(self):
+        if self.turn % 2 == 1:
+            print("white was this")
+            print("self.white_king = ", self.white_king)
+            print("self.black_king = ", self.black_king)
+            return self.is_check(self.white_king[0], self.white_king[1], "w")
+        if self.turn % 2 == 0:
+            print("black was this")
+            return self.is_check(self.black_king[0], self.black_king[1], "b")
+    
+    def is_check(self, col, row, color):
+        if color == "w":
+            check_for_color = ["b", "w"]
+        if color == "b":
+            check_for_color = ["w", "b"]
+            
+        print("color[0] = ", check_for_color[0])
+        print("color[1] = ", check_for_color[1])
+        
+        for up in range(col + 1 , 8):
+            print("up = ", up)
+            print("row = ", row)
+            if row >= 7 or up >= 7:
+                break
+            if self.board[up][row].name[0] == check_for_color[0]:
+                return True
+            if self.board[up][row].name[0] == check_for_color[1]:
+                break
+        for down in range(col - 1 , 0, -1):
+            if down >= 7 or row >= 7:
+                break
+            if self.board[down][row].name[0] == check_for_color[0]:
+                return True
+            if self.board[down][row].name[0] == check_for_color[1]:
+                break
+        for left in range(row - 1, 0, -1):
+            if left >= 7 or col >= 7:
+                break
+            if self.board[col][left].name[0] == check_for_color[0]:
+                return True
+            if self.board[col][left].name[0] == check_for_color[1]:
+                break
+        for right in range(row + 1, 8):
+            if col >= 7 or right >= 7:
+                break
+            if self.board[col][right].name[0] == check_for_color[0]:
+                return True
+            if self.board[col][right].name[0] == check_for_color[1]:
+                break
+        
+        for left_up in range(1, 8):
+            if col + left_up >= 7 or row + left_up >= 7:
+                break
+            if self.board[col + left_up][row + left_up].name[0] == check_for_color[0]:
+                return True
+            if self.board[col + left_up][row + left_up].name[0] == check_for_color[1]:
+                break
+        for left_down in range(1, 8):
+            if col - left_down >= 7 or row + left_down >= 7:
+                break
+            if self.board[col - left_down][row + left_down].name[0] == check_for_color[0]:
+                return True
+            if self.board[col - left_down][row + left_down].name[0] == check_for_color[1]:
+                break
+        for right_up in range(1, 8):
+            if col + right_up >= 7 or row - right_up >= 7:
+                break
+            if self.board[col + right_up][row - right_up].name[0] == check_for_color[0]:
+                return True
+            if self.board[col + right_up][row - right_up].name[0] == check_for_color[1]:
+                break
+        for right_down in range(1, 8):
+            if col - right_down >= 7 or row - right_down >= 7:
+                break
+            if self.board[col - left_down][row - left_down].name[0] == check_for_color[0]:
+                return True
+            if self.board[col - left_down][row - left_down].name[0] == check_for_color[1]:
+                break
+            
+            if col+2 < 7 and row + 1 < 7:
+                if self.board[col+2][row+1].name[0] == check_for_color[0]:
+                    return True
+            if col+2 < 7 and row - 1 < 7:
+                if self.board[col+2][row-1].name[0] == check_for_color[0]:
+                    return True
+            if col-2 < 7 and row + 1 < 7:
+                if self.board[col-2][row+1].name[0] == check_for_color[0]:
+                    return True
+            if col-2 < 7 and row - 1 < 7:
+                if self.board[col-2][row-1].name[0] == check_for_color[0]:
+                    return True    
+        return False
         
     def checkmate(self):
         pass
 
-    def check_move(self, oldcol, oldrow, newcol, newrow):     
+    def check_move(self, oldcol, oldrow, newcol, newrow):
         if self.check_legal(oldcol, oldrow, newcol, newrow):
+            if self.board[oldcol][oldrow].name == "wk":
+                self.white_king = [newrow, newcol]
+            if self.board[oldcol][oldrow].name == "bk":
+                self.black_king = [newrow, newcol]
             self.board[newcol][newrow] = self.board[oldcol][oldrow]
             self.board[oldcol][oldrow] = piece(None, None, "--", None)
             print("Legal")
@@ -291,13 +402,15 @@ class table:
         else:
             x1 = 2
             x2 = -1
-            
+        
         if turn == 1:
+            color = "w"
             if move == "0-0":
                 coords = self.convert_input_string_to_coordinates("e1", "h1")
             if move == "0-0-0":
                 coords = self.convert_input_string_to_coordinates("a1", "e1")
         if turn == 0:
+            color = "b"
             if move == "0-0":
                 coords = self.convert_input_string_to_coordinates("e8", "h8")
             if move == "0-0-0":
@@ -308,6 +421,13 @@ class table:
             and not self.board[coords[2]][coords[3]].moved
             and self.board[coords[0]][coords[1]].name in kings_rooks
             and self.board[coords[2]][coords[3]].name in kings_rooks):
+            
+                for i in range(coords[1], coords[3]):
+                    if self.is_check(coords[0], i, color) == True:
+                        print("You Are In Check!")
+                        print("Not Legal")
+                        return False
+            
                 self.board[coords[0]][coords[1]].move(coords[3]+x2, filter_y[coords[2]])
                 self.board[coords[2]][coords[3]].move(coords[1]+x1, filter_y[coords[0]])
                 self.board[coords[0]][coords[1]+x1], self.board[coords[2]][coords[3]+x2] = self.board[coords[2]][coords[3]], self.board[coords[0]][coords[1]]
@@ -318,8 +438,7 @@ class table:
                 return True
         print("Not Legal")
         return False    
-        
-        
+    
     def get_move_input(self, start, end=""):
         print("\nNewMove: {} -> {}\n".format(start, end))
         if(type(start) == type(end) == str and end != ""):
@@ -327,7 +446,11 @@ class table:
             if start[0] not in COLS or end[0] not in COLS or start[1] not in ROWS or end[1] not in ROWS:
                 print("Wrong input handed, Please enter strings, e.g. (\"A1\",\"A2\") ")
                 return False
+            
             coords = self.convert_input_string_to_coordinates(start, end)
+            
+            print("coords = ", coords)
+            
             return self.check_move(coords[0], coords[1], coords[2], coords[3])
         
         elif start == "0-0" or start == "0-0-0":
@@ -335,7 +458,7 @@ class table:
         else:
             print("Wrong input handed, Please enter strings, e.g. (\"A1\",\"A2\") ")
             return False
-    
+        
     def print_turn(self):
         if self.turn % 2 == 0:
             return "Black turn is"
