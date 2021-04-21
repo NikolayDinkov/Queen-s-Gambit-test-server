@@ -10,20 +10,15 @@
     <meta name="description" content="Chess site">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover">
 
-    <div class="flashes">
-        {% for message in get_flashed_messages()%}
-            {{ message }}
-            <br>
-        {% endfor %}
-    </div>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> {% block head %} {% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 
+    {% block head %} {% endblock %}
 </head>
 
 <body>
-    {% block content %} {% endblock %}
+    {% block content %}{% endblock %}
 </body>
 
 </html>

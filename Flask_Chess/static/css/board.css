@@ -4,6 +4,16 @@ img {
     display: inline-block;
 }
 
+#join_room_code,
+body {
+    -webkit-touch-callout: unset;
+    -webkit-user-select: text;
+    -khtml-user-select: unset;
+    -moz-user-select: text;
+    -ms-user-select: unset;
+    user-select: text;
+}
+
 body {
     font-size: 100%;
     margin: 50px;
