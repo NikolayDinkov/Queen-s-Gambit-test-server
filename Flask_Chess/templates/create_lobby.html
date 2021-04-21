@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+
+{% block head %}
+    <title>Create lobby</title> 
+{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-3">
+        <h1>Setup your lobby</h1>
+        <form method="POST" action="/create_lobby">
+            <div class="form-group">
+                <label for="exampleInputUsername">Lobby title</label>
+                <input type="text" name="title" class="form-control" placeholder="title" required />
+            </div>
+            <div class="form-group">
+                <label for="exampleInputUsername">Do you want your lobby to be public?</label>
+                <!-- <input type="text" name="publicity" class="form-control" placeholder="publicity" required /> -->
+                <select name="publicity" id="publicity">
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

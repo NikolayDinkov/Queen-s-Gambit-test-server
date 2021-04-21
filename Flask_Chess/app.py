@@ -1,9 +1,50 @@
+import uuid
+import os
+import random
+import json
+
 from flask import Flask
 from flask import render_template, request, redirect, make_response, url_for, flash, jsonify
 
+from flask_login import login_user, login_required, current_user, logout_user
+from flask_socketio import SocketIO, join_room, send, emit
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
+from flask_mongoengine import MongoEngine
+
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'azsumsecretkey'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test1.db'
+db = SQLAlchemy(app)
+# app.config['MONGODB_SETTINGS'] = {
+#     'db': 'your_database',
+#     'host': 'localhost',
+#     'port': 27017
+# }
 
 images = {1:"br", 2:"bn", 3:"bb", 4:"bq", 5:"bk", 6:"bp", 7:"wr", 8:"wn", 9:"wb", 10:"wq", 11:"wk", 12:"wp"}
+
+# db = MongoEngine()
+# db.init_app(app)
+
+class Lobby(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), unique=False, nullable=False)
+    player_num = db.Column(db.Integer, nullable=False)
+    password = db.Column(db.Integer, nullable=False)
+    gameState = db.Column(db.String(15), unique=False, nullable=False)
+    publicity = db.Column(db.String(15), unique=False, nullable=False)
+
+    def __repr__(self):
+        return f"Post('{self.title}')"
+
+# class Lobby(db.Document):
+#     title = db.StringField(nullable=False)
+#     player_num = db.IntegerField(nullable=False)
+#     password = db.IntegerField(nullable=False)
+#     gameState = db.StringField(nullable=False)
+#     publicity = db.StringField(nullable=False)
 
 class piece:
     def __init__(self, x, y, name, col=1):
@@ -465,12 +506,71 @@ class table:
         else:
             return "White turn is"
 
-game = table()
+db.create_all()
+gameLobby_list = []
+
 
 @app.route('/', methods=['GET', 'POST'])
-def index():
-    print(game.board[0][0].name)
-    return render_template('index.html', board=game.board)
+def front_page():
+    return render_template('frontPage.html')
+
+@app.route('/lobbies', methods=['GET', 'POST'])
+def lobbies():
+    lobbies = Lobby.query.all()
+    lobbies_av = []
+    for lobby in lobbies:
+        if lobby.player_num == 1:
+            lobbies_av.append(lobby)
+    return render_template('lobbies.html', lobbies=lobbies_av)
+
+@app.route('/create_lobby', methods=['GET', 'POST'])
+def create_lobby():
+    if request.method == 'GET':
+        return render_template('create_lobby.html')
+    else:
+        title = request.form['title']
+        publicity = request.form['publicity']
+        print(publicity)
+        lobby = Lobby(title=title, player_num=0, password=random.randint(1000000, 10000000), gameState="Created", publicity=publicity)
+        db.session.add(lobby)
+        db.session.commit()
+        print({'id' : lobby.id})
+        # game = table() # ???
+        # print(gameLobby_list)
+        # gameLobby_list.append(game)
+        # print(gameLobby_list.index(0))
+        return redirect('/index/' + str(lobby.id))
+        
+        
+
+@app.route('/join_lobby', methods=['GET', 'POST'])
+def join_lobby():
+    if request.method == 'GET':
+        return render_template('join_lobby.html')
+    else:
+        code = request.form['code']
+        for lobby in Lobby.query.all():
+            if str(lobby.password) == code and lobby.player_num == 1:
+                lobby.player_num = 2
+                db.session.commit()
+                return redirect('/index/' + str(lobby.id))
+        # flash("Invalid code", 'warning')
+        return redirect(url_for('join_lobby'))
+
+
+
+@app.route('/index/<int:id>', methods=['GET', 'POST'])
+def index(id):
+    global game
+    game = table()
+    # gameLobby_list.append(game)
+    # print(game.board[0][0].name)
+    lobby = Lobby.query.filter_by(id=id).first()
+    lobby.player_num = lobby.player_num + 1
+    db.session.commit()
+    flash(lobby.title)
+    flash(lobby.password)
+    return render_template('index.html', board=game.board, id=id)
 
 @app.route('/ajax', methods = ['POST'])
 def ajax_request():
@@ -515,7 +615,7 @@ def ajax_request():
 
     game.print_board()
 
-    return jsonify({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn})
+    return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn})
 
 if __name__ == '__main__':
     app.run(debug=True)

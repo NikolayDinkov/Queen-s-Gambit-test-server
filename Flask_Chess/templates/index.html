@@ -81,7 +81,8 @@
     </div>
 
     <div id="myDiv"></div>
-    <form action="{{url_for('index')}}">
+    <form action="{{url_for('index', id=id)}}">
+        <br>
         <button onclick="Restart();" style="position: absolute; left: 45px; top: 820px;"> restart game </button>
     </form>
 

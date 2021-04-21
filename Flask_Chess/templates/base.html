@@ -10,6 +10,13 @@
     <meta name="description" content="Chess site">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover">
 
+    <div class="flashes">
+        {% for message in get_flashed_messages()%}
+            {{ message }}
+            <br>
+        {% endfor %}
+    </div>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> {% block head %} {% endblock %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 

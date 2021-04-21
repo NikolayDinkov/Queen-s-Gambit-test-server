@@ -1,0 +1,28 @@
+{% extends 'main.html' %}
+
+{% block head %}
+    <title>Lobbies</title> 
+{% endblock  %}
+
+{% block body %}
+<br>
+<div>
+    <h1 style="display:inline">Public lobbies</h1>
+</div>
+    <hr>
+
+    {% for lobby in lobbies %}
+        {% if lobby.publicity == 'Public' %}
+            <h2>{{ lobby.title }}</h2>
+            <br>
+            <br>
+            <p style="white-space:pre-wrap">{{ lobby.publicity }} lobby</p>
+            <a class="btn btn-success float-right" href="/index/{{ lobby.id }}" >Join</a>
+            <br>
+            <br>
+            <hr>
+            <br>
+        {% endif %}
+    {% endfor%}
+
+{% endblock  %}
