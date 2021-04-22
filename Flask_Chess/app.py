@@ -103,12 +103,6 @@ def on_join(data):
     emit("guests_names", {"white" : lobby.white_player, "black" : lobby.black_player}, to=room)
     #send("player \"" + username + "\" has joined.", to=room)
 
-@socketio.on("refreshing")
-def refreshing(data):
-    print("finally woking shit")
-    lobby = Lobby.query.filter_by(id=data["room_id"]).first()
-    lobby.player_num += 2
-
 @socketio.on('leave')
 def on_leave(data):
     username = data['username']
@@ -166,7 +160,15 @@ def index(id):
     db.session.commit()
     white = lobby.white_player
     black = lobby.black_player
-    return render_template('index.html', board=game[str(id)].board, id=str(id), password=lobby.password, white=white, black=black, turn=lobby.player_num-1)
+    print(type(game))
+    print(game[str(id)])
+    return render_template('index.html', 
+    board=game[str(id)].board,
+    id=str(id), 
+    password=lobby.password,
+    white=white,
+    black=black,
+    turn=lobby.player_num-1)
 
 @app.route('/ajax', methods = ['POST'])
 def ajax_request():

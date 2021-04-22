@@ -55,7 +55,7 @@ function drop( ev ) {
                 "room_id": room_id,
                 "restart": "False"
             },
-            async: false
+            async: true
         } )
         .done( function ( data ) {
             al = data.allowed
@@ -302,6 +302,15 @@ socket.on( "move", function ( data ) {
     move_piece( data );
 } );
 
+socket.on( "guests_names", function ( data ) {
+    $( "#white" )
+        .html( data.white );
+    $( "#black" )
+        .html( data.black );
+} );
+
+/*
 window.onbeforeunload = function ( ) {
-    socket.emit( 'refreshing', { "rooom_id": room_id } );
-}
+        socket.emit( 'refreshing', { "rooom_id": room_id } );
+    } 
+*/
