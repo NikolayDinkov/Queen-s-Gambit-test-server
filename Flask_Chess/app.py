@@ -55,8 +55,15 @@ white_users = []
 black_users = []
 room_codes = []
 
-################################################3
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("error_404.html"), 400
 
+@app.errorhandler(500)
+def internal_error(e):
+	return render_template("error_500.html"), 500
+
+################################################3
 
 @socketio.on('connect')
 def on_connect():
