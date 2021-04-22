@@ -51,7 +51,8 @@ class Lobby(db.Model):
 db.create_all()
 gameLobby_list = []
 game = {}
-users = {}
+white_users = []
+black_users = []
 room_codes = []
 
 ################################################3
@@ -59,11 +60,11 @@ room_codes = []
 
 @socketio.on('connect')
 def on_connect():
-    pass
+    send("Someone had connected", broadcast=True)
 
 @socketio.on('disconnect')
-def on_connect():
-    send("Someone had disconnected")
+def on_disconnect():
+    send("Someone had disconnected", broadcast=True)
 
 @socketio.on('message')
 def handleMessage(msg):
@@ -74,19 +75,17 @@ def handleMessage(msg):
 def move(data):
     emit("move", data, to=data["room"])
 
-@socketio.on("get_session_id")
-def get_sessino_id():
-    emit("session_id", request.sid)
-
 @socketio.on('join')
 def on_join(data):
     guest_nubmer = random.randint(1000, 100000)
     username = "guest" + str(guest_nubmer)
     room = data['room']
     lobby = Lobby.query.filter_by(id=int(room)).first()
-    if lobby.player_num == 1:
+    if lobby.player_num % 2 == 1:
+        white_users.append(username)
         lobby.white_player = username
-    elif lobby.player_num == 2:
+    elif lobby.player_num % 2 == 0:
+        black_users.append(username)
         lobby.black_player = username
     db.session.commit()
     
@@ -96,6 +95,12 @@ def on_join(data):
     join_room(room)
     emit("guests_names", {"white" : lobby.white_player, "black" : lobby.black_player}, to=room)
     #send("player \"" + username + "\" has joined.", to=room)
+
+@socketio.on("refreshing")
+def refreshing(data):
+    print("finally woking shit")
+    lobby = Lobby.query.filter_by(id=data["room_id"]).first()
+    lobby.player_num += 2
 
 @socketio.on('leave')
 def on_leave(data):
@@ -121,6 +126,7 @@ def lobbies():
 
 @app.route('/create_lobby', methods=['GET', 'POST'])
 def create_lobby():
+    global game
     if request.method == 'GET':
         return render_template('create_lobby.html')
     else:
@@ -130,6 +136,7 @@ def create_lobby():
         lobby = Lobby(title=title, player_num=0, password=random.randint(1000000, 10000000), gameState="Created", publicity=publicity, white_player="", black_player="")
         db.session.add(lobby)
         db.session.commit()
+        game[str(lobby.id)] = table()
         return redirect('/index/' + str(lobby.id))
 
 @app.route('/join_lobby', methods=['GET', 'POST'])
@@ -140,26 +147,19 @@ def join_lobby():
         code = request.form['code']
         for lobby in Lobby.query.all():
             if str(lobby.password) == code and lobby.player_num == 1:
-                lobby.player_num = 2
-                db.session.commit()
                 return redirect('/index/' + str(lobby.id))
-        # flash("Invalid code", 'warning')
+        flash("Invalid code", 'warning')
         return redirect(url_for('join_lobby'))
 
 @app.route('/index/<int:id>', methods=['GET', 'POST'])
 def index(id):
     global game
-    game[str(id)] = table()
-    # gameLobby_list.append(game)
-    # print(game.board[0][0].name)
     lobby = Lobby.query.filter_by(id=id).first()
     lobby.player_num = lobby.player_num + 1
+    db.session.commit()
     white = lobby.white_player
     black = lobby.black_player
-    db.session.commit()
-    #flash(lobby.title)
-    #flash(lobby.password)
-    return render_template('index.html', board=game[str(id)].board, id=str(id), password=lobby.password, white=white, black=black)
+    return render_template('index.html', board=game[str(id)].board, id=str(id), password=lobby.password, white=white, black=black, turn=lobby.player_num-1)
 
 @app.route('/ajax', methods = ['POST'])
 def ajax_request():
@@ -169,8 +169,6 @@ def ajax_request():
     new_pos_x = ""
     new_pos_y = ""
     id = request.form["room_id"]
-
-    print((type(id)))
 
     old_pos = request.form['old_pos']
     if old_pos != "":

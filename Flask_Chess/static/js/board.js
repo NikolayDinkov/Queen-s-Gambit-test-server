@@ -34,13 +34,14 @@ function allowDrop( ev ) {
 }
 
 function drop( ev ) {
+    ev.preventDefault( );
+    //if ( turn ) {
     let bcolor = window.getComputedStyle( document.getElementById( ev.target.id ) )
         .backgroundColor
         .toString( );
     let image = ev.dataTransfer.getData( "img" );
     let element = ev.target;
     var al = false;
-    ev.preventDefault( );
     new_pos = ev.target.id
     if ( new_pos.includes( "image" ) ) {
         new_pos = ev.target.parentNode.id
@@ -91,6 +92,7 @@ function drop( ev ) {
             }
             */
         } );
+    //}
 }
 
 function move_piece( data ) {
@@ -112,10 +114,10 @@ function move_piece( data ) {
         $( "#" + data.start_id )
             .html( to );
     }
-    if ( turn ) {
-        turn = 0;
-    } else {
+    if ( turn % 2 ) {
         turn = 1;
+    } else {
+        turn = 0;
     }
 }
 
@@ -180,7 +182,6 @@ function Restart( old_pos, new_pos ) {
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
     var variables = 'old_pos=' + "&new_pos=" + "&restart=True"
     req.send( variables )
-
     return false;
 }
 */
@@ -200,7 +201,6 @@ function SendPos( old_pos, new_pos ) {
     req.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" )
     var coords = 'old_pos=' + old_pos + "&new_pos=" + new_pos + "&restart=False"
     req.send( coords )
-
     return false;
 }
 */
@@ -212,7 +212,6 @@ function drop( ev ) {
         new_pos = ev.target.parentNode.id
     }
     SendPos( old_pos, new_pos )
-
     let image = ev.dataTransfer.getData( "text" );
     let element = ev.target;
     ev.preventDefault( );
@@ -285,7 +284,9 @@ function drop( ev ) {
 */
 
 socket.on( "connect", ( ) => {
-    console.log( "na liniq" );
+    console.log( "just connected the index page" );
+    turn = parseInt( $( "#turn_id" )
+        .html( ) );
     room_id = $( "#room_id" )
         .text( );
     socket.emit( "join", {
@@ -301,9 +302,6 @@ socket.on( "move", function ( data ) {
     move_piece( data );
 } );
 
-socket.on( "guests_names", data => {
-    $( "#white" )
-        .html( data.white );
-    $( "#black" )
-        .html( data.black );
-} );
+window.onbeforeunload = function ( ) {
+    socket.emit( 'refreshing', { "rooom_id": room_id } );
+}
