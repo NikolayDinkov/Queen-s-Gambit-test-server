@@ -267,7 +267,7 @@ class table:
                         if self.board[col_s][row_s].name[0] != not_to_check:
                             if self.board[col_s][row_s].legal(col, row):
                                 print(self.board[col_s][row_s].name)
-                                return True 
+                                return True
         return False
 
     def check_move(self, oldcol, oldrow, newcol, newrow):

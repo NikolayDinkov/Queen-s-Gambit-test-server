@@ -2,6 +2,7 @@ import random
 import json
 
 from flask import Flask
+from sqlalchemy.orm.query import AliasOption
 from chess import table
 from flask import render_template, request, redirect, make_response, url_for, flash, jsonify
 
@@ -36,6 +37,8 @@ class Lobby(db.Model):
     publicity = db.Column(db.String(15), unique=False, nullable=False)
     white_player = db.Column(db.String(20))
     black_player = db.Column(db.String(20))
+    moves = db.Column(db.String(5000), nullable=False)
+    finished = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return f"Post('{self.title}')"
@@ -47,14 +50,14 @@ class Lobby(db.Model):
 #     gameState = db.StringField(nullable=False)
 #     publicity = db.StringField(nullable=False)
 
-class Game_details(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    lobby_id = db.Column(db.Integer, db.ForeignKey('lobby.id'), nullable=False)
-    # lobby_id = db.Column(db.Integer)
-    moves = db.Column(db.String(5000))
-    title = db.Column(db.String(100), unique=False, nullable=False)
-    white_player = db.Column(db.String(20))
-    black_player = db.Column(db.String(20))
+# class Game_details(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     lobby_id = db.Column(db.Integer, db.ForeignKey('lobby.id'), nullable=False)
+#     # lobby_id = db.Column(db.Integer)
+#     moves = db.Column(db.String(5000))
+#     title = db.Column(db.String(100), unique=False, nullable=False)
+#     white_player = db.Column(db.String(20))
+#     black_player = db.Column(db.String(20))
 
 db.create_all()
 gameLobby_list = []
@@ -136,13 +139,26 @@ def lobbies():
     
 @app.route('/replays', methods=['GET'])
 def replays():
-    lobbies = Game_details.query.all()
-    print(lobbies)
-    return render_template('replays_page.html', lobbies=lobbies)
+    lobbies = Lobby.query.all()
+    lobbies_av = []
+    for lobby in lobbies:
+        if lobby.finished == 1:
+            lobbies_av.append(lobby)
+    return render_template('replays_page.html', lobbies=lobbies_av)
 
 @app.route('/replay/<int:game_id>', methods=['GET'])
 def replay(game_id):
-    pass
+    # table = table()
+    lobby = Lobby.query.filter_by(id=game_id).first()
+    white = lobby.white_player
+    black = lobby.black_player
+    return render_template('index_replay.html', 
+    board=game[str(game_id)].board,
+    id=str(game_id), 
+    white=white,
+    black=black,
+    turn=lobby.player_num-1)
+
 
 @app.route('/create_lobby', methods=['GET', 'POST'])
 def create_lobby():
@@ -153,7 +169,7 @@ def create_lobby():
         title = request.form['title']
         publicity = request.form['publicity']
         print(publicity)
-        lobby = Lobby(title=title, player_num=0, password=random.randint(1000000, 10000000), gameState="Created", publicity=publicity, white_player="", black_player="")
+        lobby = Lobby(title=title, player_num=0, password=random.randint(1000000, 10000000), gameState="Created", publicity=publicity, white_player="", black_player="", moves="", finished=0)
         db.session.add(lobby)
         db.session.commit()
         game[str(lobby.id)] = table()
@@ -224,38 +240,56 @@ def ajax_request():
             elif ((coordinates[0][0] == "E" or coordinates[1][0] == "E")
             and (coordinates[1][0] == "H" or coordinates[0][0] == "H")):
                 allowed = game[id].get_move_input("0-0")
+                # print(coordinates)
+                
         else:
             allowed = game[id].get_move_input(coordinates[0], coordinates[1])
+            # print(coordinates)
+            # lobby = Lobby.query.filter_by(id=id).first()
+            # lobby.moves = lobby.moves + str(coordinates)
+            # print(lobby.moves)
     else:
         coordinates = ["","","",""]
         allowed = False
+
+    if(allowed == True):
+        lobby = Lobby.query.filter_by(id=id).first()
+        lobby.moves = lobby.moves + str(coordinates)
+        print(lobby.moves)
 
     turn = game[id].print_turn()
     print("allowed = ",allowed)
 
     game[id].print_board()
 
-    for col in range(8):
-            for row in range(8):
-                # if game[id].board[col][row].name == "bk":
-                #     if game[id].board[col][row].checkmate():
-                #         flash("White is the winner")
-                # else:
-                #     if game[id].board[col][row].name == "wk":
-                #         if game[id].board[col][row].checkmate():
-                #             flash("Black is the winner")
-                # if game[id].checkmate(col, row):
-                if game[id].board[col][row].name == "bk":
-                    if game[id].checkmate(col, row):
-                        flash("White is the winner")
-                        print("Black king is dead")
-                        return redirect(url_for('front_page'))
+    if (allowed == True):
+        for col in range(8):
+                for row in range(8):
+                    # if game[id].board[col][row].name == "bk":
+                    #     if game[id].board[col][row].checkmate():
+                    #         flash("White is the winner")
                     # else:
-                if game[id].board[col][row].name == "wk":
-                    if game[id].checkmate(col, row):
-                        flash("Black is the winner")
-                        print("White king is dead")
-                        return redirect(url_for('front_page'))
+                    #     if game[id].board[col][row].name == "wk":
+                    #         if game[id].board[col][row].checkmate():
+                    #             flash("Black is the winner")
+                    # if game[id].checkmate(col, row):
+                    if game[id].board[col][row].name == "bk":
+                        if game[id].checkmate(col, row):
+                            flash("White is the winner")
+                            print("Black king is dead")
+                            lobby = Lobby.query.filter_by(id=id).first()
+                            lobby.finished = 1
+                            db.session.commit()
+                            return redirect(url_for('front_page'))
+                        # else:
+                    if game[id].board[col][row].name == "wk":
+                        if game[id].checkmate(col, row):
+                            flash("Black is the winner")
+                            print("White king is dead")
+                            lobby = Lobby.query.filter_by(id=id).first()
+                            lobby.finished = 1
+                            db.session.commit()
+                            return redirect(url_for('front_page'))
 
 
 

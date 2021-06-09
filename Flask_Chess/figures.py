@@ -70,7 +70,7 @@ class knight(piece):
     def legal(self, new_x, new_y, taking=False):
         xdif = abs(new_x-self.x)
         ydif = abs(new_y-self.y)
-        print("xdif = {0}\n ydif = {1}   in legal in knight".format(xdif, ydif))
+        # print("xdif = {0}\n ydif = {1}   in legal in knight".format(xdif, ydif))
         if not ((xdif == 2 and ydif == 1) or (xdif == 1 and ydif == 2)):
             return False
         return True
