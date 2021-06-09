@@ -47,6 +47,14 @@ class Lobby(db.Model):
 #     gameState = db.StringField(nullable=False)
 #     publicity = db.StringField(nullable=False)
 
+class Game_details(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lobby_id = db.Column(db.Integer, db.ForeignKey('lobby.id'), nullable=False)
+    # lobby_id = db.Column(db.Integer)
+    moves = db.Column(db.String(3000))
+    title = db.Column(db.String(100), unique=False, nullable=False)
+    white_player = db.Column(db.String(20))
+    black_player = db.Column(db.String(20))
 
 db.create_all()
 gameLobby_list = []
@@ -116,14 +124,25 @@ def on_leave(data):
 def front_page():
     return render_template('frontPage.html')
 
-@app.route('/lobbies', methods=['GET', 'POST'])
+@app.route('/lobbies', methods=['GET'])
 def lobbies():
     lobbies = Lobby.query.all()
+    print(lobbies)
     lobbies_av = []
     for lobby in lobbies:
         if lobby.player_num == 1:
             lobbies_av.append(lobby)
     return render_template('lobbies.html', lobbies=lobbies_av)
+    
+@app.route('/replays', methods=['GET'])
+def replays():
+    lobbies = Game_details.query.all()
+    print(lobbies)
+    return render_template('replays_page.html', lobbies=lobbies)
+
+@app.route('/replay/<int:game_id>', methods=['GET'])
+def replay(game_id):
+    pass
 
 @app.route('/create_lobby', methods=['GET', 'POST'])
 def create_lobby():
@@ -178,8 +197,9 @@ def ajax_request():
     new_pos_x = ""
     new_pos_y = ""
     id = request.form["room_id"]
-
     old_pos = request.form['old_pos']
+
+
     if old_pos != "":
         old_pos_x = int(old_pos[9])
         old_pos_y = int(old_pos[10])
@@ -213,6 +233,28 @@ def ajax_request():
     print("allowed = ",allowed)
 
     game[id].print_board()
+
+    for col in range(8):
+            for row in range(8):
+                # if game[id].board[col][row].name == "bk":
+                #     if game[id].board[col][row].checkmate():
+                #         flash("White is the winner")
+                # else:
+                #     if game[id].board[col][row].name == "wk":
+                #         if game[id].board[col][row].checkmate():
+                #             flash("Black is the winner")
+                if game[id].checkmate(col, row):
+                    if game[id].board[col][row].name == "bk":
+                        flash("White is the winner")
+                        print("Black king is dead")
+                        return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": -1})
+                    else:
+                        if game[id].board[col][row].name == "wk":
+                            flash("Black is the winner")
+                            print("White king is dead")
+                        return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": -1})
+
+
 
     return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn})
 

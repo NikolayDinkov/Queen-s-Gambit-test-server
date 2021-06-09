@@ -1,0 +1,17 @@
+{% extends 'main.html' %} {% block head %}
+<title>Replays</title>
+{% endblock %} {% block body %}
+<br>
+<div>
+    <h1 style="display:inline">Avaliable replays</h1>
+</div>
+<hr> {% for lobby in lobbies %}
+<h2>{{ lobby.title }}</h2>
+<br>
+<br>
+<p style="white-space:pre-wrap">{{ lobby.winner }} </p>
+<a class="btn btn-success float-right" href="/replay/{{ lobby.id }}">View</a>
+<br>
+<br>
+<hr>
+<br> {% endfor%} {% endblock %}

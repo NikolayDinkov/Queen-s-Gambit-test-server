@@ -149,8 +149,10 @@ class table:
                     if self.board[oldcol][newrow].passant:
                         self.board[oldcol][newrow].taken()
                         self.board[oldcol][newrow] = piece(None, None, "--", None)
+                        print("taking")
                 else:
                     self.board[newcol][newrow].taken()
+                    print("taking")
             return True
         else:
             return False
@@ -248,8 +250,13 @@ class table:
                     return True    
         return False
         
-    def checkmate(self):
-        pass
+    def checkmate(self, col, row):
+        # print(self.board[col][row].name)
+        if(self.board[col][row].active == False):
+            print(self.board[col][row].name)
+            if self.board[col][row].name == "bk" or self.board[col][row].name == "wk":
+                return True
+        return False
 
     def check_move(self, oldcol, oldrow, newcol, newrow):
         if self.check_legal(oldcol, oldrow, newcol, newrow):
