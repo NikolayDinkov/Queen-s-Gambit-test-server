@@ -51,7 +51,7 @@ class Game_details(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     lobby_id = db.Column(db.Integer, db.ForeignKey('lobby.id'), nullable=False)
     # lobby_id = db.Column(db.Integer)
-    moves = db.Column(db.String(3000))
+    moves = db.Column(db.String(5000))
     title = db.Column(db.String(100), unique=False, nullable=False)
     white_player = db.Column(db.String(20))
     black_player = db.Column(db.String(20))
@@ -199,6 +199,7 @@ def ajax_request():
     id = request.form["room_id"]
     old_pos = request.form['old_pos']
 
+    
 
     if old_pos != "":
         old_pos_x = int(old_pos[9])
@@ -243,16 +244,18 @@ def ajax_request():
                 #     if game[id].board[col][row].name == "wk":
                 #         if game[id].board[col][row].checkmate():
                 #             flash("Black is the winner")
-                if game[id].checkmate(col, row):
-                    if game[id].board[col][row].name == "bk":
+                # if game[id].checkmate(col, row):
+                if game[id].board[col][row].name == "bk":
+                    if game[id].checkmate(col, row):
                         flash("White is the winner")
                         print("Black king is dead")
-                        return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": -1})
-                    else:
-                        if game[id].board[col][row].name == "wk":
-                            flash("Black is the winner")
-                            print("White king is dead")
-                        return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": -1})
+                        return redirect(url_for('front_page'))
+                    # else:
+                if game[id].board[col][row].name == "wk":
+                    if game[id].checkmate(col, row):
+                        flash("Black is the winner")
+                        print("White king is dead")
+                        return redirect(url_for('front_page'))
 
 
 

@@ -251,11 +251,23 @@ class table:
         return False
         
     def checkmate(self, col, row):
+        print("Checkmate method")
+        statement = False
+        not_to_check = self.board[col][row].name[0]
+        print(not_to_check)
         # print(self.board[col][row].name)
-        if(self.board[col][row].active == False):
-            print(self.board[col][row].name)
-            if self.board[col][row].name == "bk" or self.board[col][row].name == "wk":
-                return True
+        # if(self.board[col][row].active == False):
+        #     print(self.board[col][row].name)
+        #     if self.board[col][row].name == "bk" or self.board[col][row].name == "wk":
+        #         return True
+        for col_s in range(8):
+            for row_s in range(8):
+                if self.board[col_s][row_s].name != '--':
+                    if col_s != col and row_s != row:
+                        if self.board[col_s][row_s].name[0] != not_to_check:
+                            if self.board[col_s][row_s].legal(col, row):
+                                print(self.board[col_s][row_s].name)
+                                return True 
         return False
 
     def check_move(self, oldcol, oldrow, newcol, newrow):
