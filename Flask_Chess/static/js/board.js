@@ -76,7 +76,10 @@ function drop( ev ) {
             }
             $( "#myDiv" )
                 .html( data.old_position + " -> " + data.new_position );
-
+            if ( data.redirect != "" ) {
+                alert( "Game Ended" );
+                window.location.replace( data.redirect );
+            }
             socket.emit( "move", { "start_id": old_pos, "end_id": new_pos, "room": room_id, "turn": turn } );
             //move_piece( { "start_id": old_pos, "end_id": new_pos } );
             /*

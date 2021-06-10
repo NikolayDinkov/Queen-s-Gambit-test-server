@@ -268,15 +268,6 @@ def ajax_request():
     if (allowed == True):
         for col in range(8):
                 for row in range(8):
-                    # if game[id].board[col][row].name == "bk":
-                    #     if game[id].board[col][row].checkmate():
-                    #         flash("White is the winner")
-                    # else:
-                    #     if game[id].board[col][row].name == "wk":
-                    #         if game[id].board[col][row].checkmate():
-                    #             flash("Black is the winner")
-                    # if game[id].checkmate(col, row):
-                    
                     if game[id].board[col][row].name == "bk":
                         if game[id].checkmate(col, row):
                             flash("White is the winner")
@@ -284,7 +275,7 @@ def ajax_request():
                             lobby = Lobby.query.filter_by(id=id).first()
                             lobby.finished = 1
                             db.session.commit()
-                            return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":True})
+                            return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":url_for("replays")})
 
                     if game[id].board[col][row].name == "wk":
                         if game[id].checkmate(col, row):
@@ -293,11 +284,11 @@ def ajax_request():
                             lobby = Lobby.query.filter_by(id=id).first()
                             lobby.finished = 1
                             db.session.commit()
-                            return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":True})
+                            return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":url_for("replays")})
 
 
 
-    return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":False})
+    return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":""})
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
