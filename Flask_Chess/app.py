@@ -191,7 +191,7 @@ def join_lobby():
         for lobby in Lobby.query.all():
             if str(lobby.password) == code and lobby.player_num == 1:
                 return redirect('/index/' + str(lobby.id))
-        flash("Invalid code", 'warning')
+        # flash("Invalid code", 'warning')
         return redirect(url_for('join_lobby'))
 
 @app.route('/index/<int:id>', methods=['GET', 'POST'])
