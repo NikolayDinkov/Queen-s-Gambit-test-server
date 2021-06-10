@@ -93,6 +93,10 @@ def handleMessage(msg):
 def move(data):
     emit("move", data, to=data["room"])
 
+@socketio.on("game_end")
+def game_end(data):
+    emit("game_end", data, to=data["room"])
+
 @socketio.on('join')
 def on_join(data):
     guest_nubmer = random.randint(1000, 100000)
@@ -258,6 +262,7 @@ def ajax_request():
         lobby = Lobby.query.filter_by(id=id).first()
         print(f'cooridinates[0] = "{game[id].convert_input_string_to_coordinates(coordinates[0], coordinates[1])}"')
         lobby.moves = lobby.moves + str(old_pos[9:11]) + str(new_pos[9:11])
+        db.session.commit()
         print(lobby.moves)
 
     turn = game[id].print_turn()

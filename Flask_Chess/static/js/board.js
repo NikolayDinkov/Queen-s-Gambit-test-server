@@ -77,8 +77,10 @@ function drop( ev ) {
             $( "#myDiv" )
                 .html( data.old_position + " -> " + data.new_position );
             if ( data.redirect != "" ) {
-                alert( "Game Ended" );
-                window.location.replace( data.redirect );
+                socket.emit( "game_end", {
+                    "room": room_id,
+                    "url": data.redirect
+                } );
             }
             socket.emit( "move", { "start_id": old_pos, "end_id": new_pos, "room": room_id, "turn": turn } );
             //move_piece( { "start_id": old_pos, "end_id": new_pos } );
@@ -312,6 +314,10 @@ socket.on( "guests_names", function ( data ) {
         .html( data.black );
 } );
 
+socket.on( "game_end", function ( data ) {
+    alert( "Game ended" );
+    window.location.replace( data.url );
+} );
 /*
 window.onbeforeunload = function ( ) {
         socket.emit( 'refreshing', { "rooom_id": room_id } );
