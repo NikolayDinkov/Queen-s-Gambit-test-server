@@ -10,7 +10,6 @@
     <title>Chess</title>
 
     <script src="{{url_for('static', filename='js/board.js')}}" async defer></script>
-
 </head>
 
 <body>
@@ -83,17 +82,15 @@
             </div>
         </div>
 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class=flashes>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
     </div>
-    
+
     <div id="myDiv" style="position: absolute; left: 45px; top: 780px;"></div>
     <form action="{{url_for('index', id=id)}}">
         <br>

@@ -152,12 +152,15 @@ def replay(game_id):
     lobby = Lobby.query.filter_by(id=game_id).first()
     white = lobby.white_player
     black = lobby.black_player
+    game[str(game_id)] = table()
+
     return render_template('index_replay.html', 
     board=game[str(game_id)].board,
     id=str(game_id), 
     white=white,
     black=black,
-    turn=lobby.player_num-1)
+    turn=lobby.player_num-1,
+    moves = lobby.moves)
 
 
 @app.route('/create_lobby', methods=['GET', 'POST'])
@@ -215,8 +218,6 @@ def ajax_request():
     id = request.form["room_id"]
     old_pos = request.form['old_pos']
 
-    
-
     if old_pos != "":
         old_pos_x = int(old_pos[9])
         old_pos_y = int(old_pos[10])
@@ -229,6 +230,7 @@ def ajax_request():
     restart = request.form['restart']
     if restart == "True":
         game[id] = table()
+
 
     if old_pos != "" and new_pos != "":
         coordinates = game[id].convert_coordinates_to_string(old_pos_x, old_pos_y, new_pos_x, new_pos_y)
@@ -254,7 +256,8 @@ def ajax_request():
 
     if(allowed == True):
         lobby = Lobby.query.filter_by(id=id).first()
-        lobby.moves = lobby.moves + str(coordinates)
+        print(f'cooridinates[0] = "{game[id].convert_input_string_to_coordinates(coordinates[0], coordinates[1])}"')
+        lobby.moves = lobby.moves + str(old_pos[9:11]) + str(new_pos[9:11])
         print(lobby.moves)
 
     turn = game[id].print_turn()
@@ -273,6 +276,7 @@ def ajax_request():
                     #         if game[id].board[col][row].checkmate():
                     #             flash("Black is the winner")
                     # if game[id].checkmate(col, row):
+                    
                     if game[id].board[col][row].name == "bk":
                         if game[id].checkmate(col, row):
                             flash("White is the winner")
@@ -280,8 +284,8 @@ def ajax_request():
                             lobby = Lobby.query.filter_by(id=id).first()
                             lobby.finished = 1
                             db.session.commit()
-                            return redirect(url_for('front_page'))
-                        # else:
+                            return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":True})
+
                     if game[id].board[col][row].name == "wk":
                         if game[id].checkmate(col, row):
                             flash("Black is the winner")
@@ -289,11 +293,11 @@ def ajax_request():
                             lobby = Lobby.query.filter_by(id=id).first()
                             lobby.finished = 1
                             db.session.commit()
-                            return redirect(url_for('front_page'))
+                            return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":True})
 
 
 
-    return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn})
+    return ({"old_position": coordinates[0], "new_position":coordinates[1], "allowed":allowed, "restart":restart, "turn": turn, "redirect":False})
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

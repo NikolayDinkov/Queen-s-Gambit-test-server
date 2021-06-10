@@ -13,16 +13,18 @@
         <button id="previous" onclick="previous()">Previous</button>
         <button id="next" onclick="next()">Next</button>
     </div>
-
-    <!-- <script src="{{url_for('static', filename='js/board.js')}}" async defer></script> -->
-
+    <script src="{{url_for('static', filename='js/review.js')}}" async defer></script>
 </head>
 
 <body>
+
     <p id="turn_id" hidden>{{turn}}</p>
     <p id="room_id" hidden>{{id}}</p>
+    <p id="moves">{{moves}}</p>
+
     <h3 id="white" style="position: fixed; left:1150px; top: 780px;">{{white}}</h3>
     <h3 id="black" style="position: fixed; left:1150px; top: 80px;">{{black}}</h3>
+
     <div class="wrapper">
         <div class="top">
             <div class="wrapper-inner">
@@ -54,36 +56,36 @@
 
         {% for row in range(8) %} {% for col in range(8) %}
 
-        <div name="no_name" class="box" id="grid_box_{{row}}{{col}}" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+        <div name="no_name" class="box" id="grid_box_{{row}}{{col}}">
             {% if board[col][row].name != "--"%}
-            <img name="{{board[col][row].name}}" id="chess_image_{{row}}{{col}}" class="piece" draggable="ture" ondragstart="drag(event)" src="/static/pictures/{{board[col][row].name}}.svg"> {% endif %}
+            <img name="{{board[col][row].name}}" draggable="ture" ondragstart="drag(event)" id="chess_image_{{row}}{{col}}" class="piece" src="/static/pictures/{{board[col][row].name}}.svg "> {% endif %}
         </div>
 
         {% endfor %} {% endfor %}
 
-        <div class="right_side">
-            <div class="box-side">8</div>
-            <div class="box-side">7</div>
-            <div class="box-side">6</div>
-            <div class="box-side">5</div>
-            <div class="box-side">4</div>
-            <div class="box-side">3</div>
-            <div class="box-side">2</div>
-            <div class="box-side">1</div>
+        <div class="right_side ">
+            <div class="box-side ">8</div>
+            <div class="box-side ">7</div>
+            <div class="box-side ">6</div>
+            <div class="box-side ">5</div>
+            <div class="box-side ">4</div>
+            <div class="box-side ">3</div>
+            <div class="box-side ">2</div>
+            <div class="box-side ">1</div>
         </div>
 
-        <div class="bottom">
-            <div class="wrapper-inner">
-                <div class="box-inner"></div>
-                <div class="box-inner">A</div>
-                <div class="box-inner">B</div>
-                <div class="box-inner">C</div>
-                <div class="box-inner">D</div>
-                <div class="box-inner">E</div>
-                <div class="box-inner">F</div>
-                <div class="box-inner">G</div>
-                <div class="box-inner">H</div>
-                <div class="box-inner"></div>
+        <div class="bottom ">
+            <div class="wrapper-inner ">
+                <div class="box-inner "></div>
+                <div class="box-inner ">A</div>
+                <div class="box-inner ">B</div>
+                <div class="box-inner ">C</div>
+                <div class="box-inner ">D</div>
+                <div class="box-inner ">E</div>
+                <div class="box-inner ">F</div>
+                <div class="box-inner ">G</div>
+                <div class="box-inner ">H</div>
+                <div class="box-inner "></div>
             </div>
         </div>
 
