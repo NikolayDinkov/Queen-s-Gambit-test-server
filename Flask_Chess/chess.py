@@ -269,11 +269,7 @@ class table:
                             if self.board[col_s][row_s].name != "wb" and self.board[col_s][row_s].name != "bb":
                                 if self.board[col_s][row_s].legal(col, row):
                                     # print(self.board[col_s][row_s].name)
-<<<<<<< HEAD
 
-=======
-                                    
->>>>>>> 4c89cdc402aafac71929fc8f50b79dd30d36033b
                                     return True
         return False
 
