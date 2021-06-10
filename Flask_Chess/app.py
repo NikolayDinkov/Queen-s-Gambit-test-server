@@ -275,7 +275,7 @@ def ajax_request():
                 for row in range(8):
                     if game[id].board[col][row].name == "bk":
                         if game[id].checkmate(col, row):
-                            flash("White is the winner")
+                            # flash("White is the winner")
                             print("Black king is dead")
                             lobby = Lobby.query.filter_by(id=id).first()
                             lobby.finished = 1
@@ -284,7 +284,7 @@ def ajax_request():
 
                     if game[id].board[col][row].name == "wk":
                         if game[id].checkmate(col, row):
-                            flash("Black is the winner")
+                            # flash("Black is the winner")
                             print("White king is dead")
                             lobby = Lobby.query.filter_by(id=id).first()
                             lobby.finished = 1
